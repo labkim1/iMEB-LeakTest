@@ -1,0 +1,2415 @@
+﻿<Controls:MetroWindow
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:ni="http://schemas.ni.com/controls/2009/xaml/presentation"
+        xmlns:Controls="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
+        xmlns:notifications="clr-namespace:Notifications.Wpf.Controls;assembly=Notifications.Wpf"                         
+        xmlns:TLog="clr-namespace:TLog"
+        xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks" 
+        xmlns:System="clr-namespace:System;assembly=mscorlib" x:Class="iMEB_LeakTest_No4.MainWindow"
+        ShowIconOnTitleBar="True" ShowTitleBar="True" ShowDialogsOverTitleBar="True"                      
+        Title="iMEB Leak Test" Height="1024" Width="1280" Loaded="Window_Loaded" Icon="/iMEB LeakTest No4;component/iMEB.ico" Closing="MetroWindow_Closing" >
+
+    <Controls:MetroWindow.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="/Resources/Icons.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+            <TLog:NullVisibilityConverter x:Key="NullVisibilityConverter" />
+            <TLog:VisibilityBoolConverter x:Key="VisibilityBoolConverter" />
+            <TLog:FreezeTextConverter     x:Key="FreezeTextConverter" />
+            <TLog:NullBooleanConverter    x:Key="NullBooleanConverter" />
+        </ResourceDictionary>
+
+    </Controls:MetroWindow.Resources>
+
+    <Controls:MetroWindow.RightWindowCommands>
+        <Controls:WindowCommands>
+            <Button x:Name="SystemConfig" Content="관리자" Click="SystemConfig_Click" />
+        </Controls:WindowCommands>
+    </Controls:MetroWindow.RightWindowCommands>
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="220" />
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="130"/>
+            <RowDefinition Height="1*"/>
+            <RowDefinition Height="1*"/>
+            <RowDefinition Height="AUTO"/>
+            <RowDefinition Height="32"/>
+        </Grid.RowDefinitions>
+        <notifications:NotificationArea x:Name="WindowArea" Position="TopLeft" MaxItems="5"/>
+        <Popup x:Name="NGPopup" Grid.Column="0" Grid.ColumnSpan="1" Grid.Row="1" Grid.RowSpan="3" 
+                Placement="Center" AllowsTransparency="True" StaysOpen="False" PlacementTarget="{Binding RelativeSource={RelativeSource AncestorType=Window}}">
+            <Grid>
+                <Border Width="450" Height="300" BorderBrush="Blue" BorderThickness="1" Background="Honeydew" >
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="60" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="60"/>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="30"/>
+                        </Grid.RowDefinitions>
+                        <Image Grid.Column="0" Grid.Row="0" Source="pack://siteoforigin:,,,/Resources/Warning.png"   />
+                        <Label Grid.Column="1" Grid.Row="0" FontSize="24" Foreground="Red" Margin="20,0,0,0" VerticalAlignment="Center" FontWeight="Bold" FontStyle="Italic">NG 및 알람 정보 표시</Label>
+                        <ScrollViewer Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="1" Margin="2,2,2,2" >
+                            <StackPanel Orientation="Vertical" Margin="3,3,3,3" >
+                                <TextBlock  x:Name="NGMessage1" FontSize="16" TextWrapping="Wrap"></TextBlock>
+                            </StackPanel>
+                        </ScrollViewer>
+                        <Label Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="2">본 화면은 자동으로 사라집니다. 자동생산, 수동변경시 ...</Label>
+                    </Grid>
+                </Border>
+            </Grid>
+        </Popup>
+        <Popup x:Name="OKPopup" Grid.Column="0" Grid.ColumnSpan="1" Grid.Row="1" Grid.RowSpan="3" Placement="Center" AllowsTransparency="True">
+            <Grid>
+                <Border Width="600" Height="300" BorderBrush="Blue" BorderThickness="1" Background="Honeydew" >
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="60" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="60"/>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="30"/>
+                        </Grid.RowDefinitions>
+                        <Image Grid.Column="0" Grid.Row="0"  />
+                        <Label Grid.Row="0" Foreground="Blue" FontSize="40" Margin="4,0,76,0" VerticalAlignment="Center" FontWeight="Bold" FontStyle="Italic" Grid.ColumnSpan="2">제품 OK</Label>
+                        <ScrollViewer Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="1" Margin="2,2,2,2" >
+                            <StackPanel Orientation="Vertical" >
+                                <TextBlock Margin="10,20,10,10" x:Name="OKMessage1" FontSize="25" ></TextBlock>
+                            </StackPanel>
+                        </ScrollViewer>
+
+                    </Grid>
+                </Border>
+                <Button x:Name="okpopup_close" Content="X" VerticalAlignment="Top" Margin="572,4,5,0" Click="okpopup_close_Click"/>
+            </Grid>
+        </Popup>
+        <!-- 왼쪽 상단 로그 및 이미지-->
+        <Grid Grid.Column="0" Grid.Row="0"  >
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="40"/>
+                <RowDefinition Height="30"/>
+            </Grid.RowDefinitions>
+            <Border Grid.Row="0" Grid.RowSpan="2"  BorderThickness="1" Margin="1,1,1,1">
+                <Border.BorderBrush>
+                    <SolidColorBrush Color="{DynamicResource {x:Static SystemColors.GradientActiveCaptionColorKey}}"/>
+                </Border.BorderBrush>
+                <Image x:Name="Title_Image1" Loaded="Title_Image_Loaded" Source="pack://siteoforigin:,,,/Resources/ECUAssy.png"  />
+            </Border>
+            <Border Grid.Row="3"  BorderThickness="1" Margin="1,1,1,1">
+                <Border.BorderBrush>
+                    <SolidColorBrush Color="{DynamicResource {x:Static SystemColors.GradientActiveCaptionColorKey}}"/>
+                </Border.BorderBrush>
+                <Image x:Name="Title_Image2" Loaded="Title_Image_Loaded" Source="pack://siteoforigin:,,,/Resources/colorTone_img1.jpg" />
+            </Border>
+        </Grid>
+        <!-- 오른쪽 상단 타이늘 및 정보 표시-->
+        <Grid Grid.Column="1" Grid.Row="0">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="50"/>
+                <RowDefinition Height="35"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+            <Grid Grid.Row="0">
+                <Grid.Triggers>
+                    <EventTrigger RoutedEvent="Grid.Loaded">
+                        <BeginStoryboard>
+                            <Storyboard>
+                                <DoubleAnimation From="1" To="10" Duration="00:00:03" AutoReverse="True" RepeatBehavior="Forever"
+                                                    Storyboard.TargetName="blurEffect" 
+                                                    Storyboard.TargetProperty="Radius">
+                                </DoubleAnimation>
+                            </Storyboard>
+                        </BeginStoryboard>
+                    </EventTrigger>
+                </Grid.Triggers>
+                <Border >
+                    <Border.Background>
+                        <SolidColorBrush Color="{DynamicResource {x:Static SystemColors.HotTrackColorKey}}"/>
+                    </Border.Background>
+                    <Border.BorderBrush>
+                        <SolidColorBrush Color="{DynamicResource {x:Static SystemColors.GradientActiveCaptionColorKey}}"/>
+                    </Border.BorderBrush>
+                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Right">
+                        <Label x:Name="MAObject" Content="iMEB ASSY LEAK EOL TEST Ver " FontSize="20" FontFamily="Myanmar Text" FontWeight="Bold" VerticalAlignment="Center" VerticalContentAlignment="Center" Foreground="#FFE2E1E1">
+                            <Label.Effect>
+                                <BlurEffect Radius="1" x:Name="blurEffect" RenderingBias="Quality"/>
+                            </Label.Effect>
+                        </Label>
+                        <Label x:Name="lbl_ProgramVersion" Content="0.000"  FontSize="20" FontFamily="Myanmar Text" FontWeight="Bold" VerticalAlignment="Center" VerticalContentAlignment="Center" Foreground="#FFE2E1E1"/>
+                        <Button x:Name="TouchKEY" Click="TouchKEY_Click" Content="KEY"/>
+                    </StackPanel>
+                </Border>
+            </Grid>
+            <Grid Grid.Row="1">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="0.6*" />
+                    <ColumnDefinition Width="1*" />
+                    <ColumnDefinition Width="0.7*" />
+                    <ColumnDefinition Width="2*" />
+                </Grid.ColumnDefinitions>
+                <Border Grid.Column="0" BorderThickness="1">
+                    <Border.BorderBrush>
+                        <SolidColorBrush Color="{DynamicResource {x:Static SystemColors.GradientActiveCaptionColorKey}}"/>
+                    </Border.BorderBrush>
+                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                        <iconPacks:PackIconMaterial Margin="5,0,0,0" Kind="EarthBox" Foreground="Black" VerticalAlignment="Center" HorizontalAlignment="Left" />
+                        <Label Content="PRODUCT" VerticalContentAlignment="Center"/>
+                        <Label x:Name="D_ProductCode" Content="H1" Width="35" VerticalContentAlignment="Center" HorizontalContentAlignment="Right" VerticalAlignment="Stretch" Foreground="Blue" FontSize="14" FontWeight="Bold"/>
+                    </StackPanel>
+                </Border>
+                <Border Grid.Column="1" BorderThickness="1" Margin="1,0,1,0">
+                    <Border.BorderBrush>
+                        <SolidColorBrush Color="{DynamicResource {x:Static SystemColors.GradientActiveCaptionColorKey}}"/>
+                    </Border.BorderBrush>
+                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                        <iconPacks:PackIconMaterial Margin="5,0,0,0"  Kind="Barcode" VerticalAlignment="Center" HorizontalAlignment="Left"/>
+                        <Label Content="BARCODE"/>
+                        <Label x:Name="D_BarCode" Content="01234567891" Width="130"  VerticalContentAlignment="Center" HorizontalContentAlignment="Right" VerticalAlignment="Stretch" Foreground="Blue" FontSize="14" FontWeight="Bold"/>
+                    </StackPanel>
+                </Border>
+                <Border Grid.Column="2" BorderThickness="1"  Margin="0,0,1,0">
+                    <Border.BorderBrush>
+                        <SolidColorBrush Color="{DynamicResource {x:Static SystemColors.GradientActiveCaptionColorKey}}"/>
+                    </Border.BorderBrush>
+                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                        <iconPacks:PackIconMaterial Margin="5,0,0,0"  Kind="Target" VerticalAlignment="Center" HorizontalAlignment="Left"/>
+                        <Label Content="USER"/>
+                        <Label x:Name="D_User" Content="User" Width="100"  VerticalContentAlignment="Center" HorizontalContentAlignment="Right" VerticalAlignment="Stretch" Foreground="Blue" FontSize="14" FontWeight="Bold"/>
+                    </StackPanel>
+                </Border>
+                <Border Grid.Column="3" BorderThickness="1"  Margin="0,0,1,0">
+                    <Border.BorderBrush>
+                        <SolidColorBrush Color="{DynamicResource {x:Static SystemColors.GradientActiveCaptionColorKey}}"/>
+                    </Border.BorderBrush>
+                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                        <iconPacks:PackIconMaterial Margin="5,0,0,0"  Kind="PackageUp" VerticalAlignment="Center" HorizontalAlignment="Left"/>
+                        <Label Content="MES "/>
+                        <Label x:Name="D_MES" Content="message" Width="420"  VerticalContentAlignment="Center" HorizontalContentAlignment="Left" VerticalAlignment="Stretch" Foreground="Gray" FontSize="12" FontWeight="Bold"/>
+                    </StackPanel>
+                </Border>
+            </Grid>
+            <Grid Grid.Row="2">
+                <Border  BorderThickness="1" Margin="0,-1,0,1">
+                    <Border.BorderBrush>
+                        <SolidColorBrush Color="{DynamicResource {x:Static SystemColors.GradientActiveCaptionColorKey}}"/>
+                    </Border.BorderBrush>
+
+                    <StackPanel Orientation="Horizontal">
+                        <Border x:Name="Test_Lamp_0" BorderThickness="1" Margin="3,3,3,3" Width="120" MouseLeftButtonDown="Test_Lamp_MouseLeftButtonDown">
+                            <Border.BorderBrush>
+                                <SolidColorBrush Color="{DynamicResource {x:Static SystemColors.ActiveCaptionColorKey}}"/>
+                            </Border.BorderBrush>
+                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                <iconPacks:PackIconMaterial Margin="5,0,0,0" Kind="Adjust" VerticalAlignment="Center" HorizontalAlignment="Left"/>
+                                <Label Content="외부 LEAK" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" />
+                            </StackPanel>
+                        </Border>
+                        <Border x:Name="Test_Lamp_1" BorderThickness="1" Margin="3,3,3,3" Width="120" MouseLeftButtonDown="Test_Lamp_MouseLeftButtonDown" >
+                            <Border.BorderBrush>
+                                <SolidColorBrush Color="{DynamicResource {x:Static SystemColors.ActiveCaptionColorKey}}"/>
+                            </Border.BorderBrush>
+                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                <iconPacks:PackIconMaterial Margin="5,0,0,0" Kind="Adjust" VerticalAlignment="Center" HorizontalAlignment="Left"/>
+                                <Label Content="-----------------" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" />
+                            </StackPanel>
+                        </Border>
+                        <Border x:Name="Test_Lamp_1_1"  BorderThickness="1" Margin="3,3,3,3" Width="100" MouseLeftButtonDown="Test_Lamp_MouseLeftButtonDown">
+                            <Border.BorderBrush>
+                                <SolidColorBrush Color="{DynamicResource {x:Static SystemColors.ActiveCaptionColorKey}}"/>
+                            </Border.BorderBrush>
+                            <Label Content="내부 LEAK(5.0)" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" />
+                        </Border>
+                        <Border x:Name="Test_Lamp_3" BorderThickness="1" Margin="3,3,3,3" Width="160" MouseLeftButtonDown="Test_Lamp_MouseLeftButtonDown">
+                            <Border.BorderBrush>
+                                <SolidColorBrush Color="{DynamicResource {x:Static SystemColors.ActiveCaptionColorKey}}"/>
+                            </Border.BorderBrush>
+                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                <iconPacks:PackIconMaterial Margin="5,0,0,0" Kind="CarConnected" VerticalAlignment="Center" HorizontalAlignment="Left"/>
+                                <Label Content="ECU LEAK TEST" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" />
+                            </StackPanel>
+                        </Border>
+                        <Border x:Name="Test_Analay1" BorderThickness="1" Margin="3,3,3,3" Width="120" MouseLeftButtonDown="Test_Lamp_MouseLeftButtonDown">
+                            <Border.BorderBrush>
+                                <SolidColorBrush Color="{DynamicResource {x:Static SystemColors.ActiveCaptionColorKey}}"/>
+                            </Border.BorderBrush>
+                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                <iconPacks:PackIconMaterial Margin="5,0,0,0" Kind="CarConnected" VerticalAlignment="Center" HorizontalAlignment="Left"/>
+                                <Label Content="모터전류평가" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" />
+                            </StackPanel>
+                        </Border>
+                        <Border x:Name="Test_Lamp_2" BorderThickness="1" Margin="3,3,3,3" Width="120" MouseLeftButtonDown="Test_Lamp_MouseLeftButtonDown">
+                            <Border.BorderBrush>
+                                <SolidColorBrush Color="{DynamicResource {x:Static SystemColors.ActiveCaptionColorKey}}"/>
+                            </Border.BorderBrush>
+                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                <iconPacks:PackIconMaterial Margin="5,0,0,0" Kind="CarConnected" VerticalAlignment="Center" HorizontalAlignment="Left"/>
+                                <Label Content="ECU DTC" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" />
+                            </StackPanel>
+                        </Border>
+                        <Border x:Name="Test_Analay" BorderThickness="1" Margin="3,3,3,3" Width="120" MouseLeftButtonDown="Test_Lamp_MouseLeftButtonDown">
+                            <Border.BorderBrush>
+                                <SolidColorBrush Color="{DynamicResource {x:Static SystemColors.ActiveCaptionColorKey}}"/>
+                            </Border.BorderBrush>
+                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                <iconPacks:PackIconMaterial Margin="5,0,0,0" Kind="Delta" VerticalAlignment="Center" HorizontalAlignment="Left"/>
+                                <Label Content="ANALYSIS" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" />
+                            </StackPanel>
+                        </Border>
+
+                        <Border Visibility="Hidden" x:Name="Test_Lamp_3_1" BorderThickness="1" Margin="3,3,3,3" Width="140" MouseLeftButtonDown="Test_Lamp_MouseLeftButtonDown">
+                            <Border.BorderBrush>
+                                <SolidColorBrush Color="{DynamicResource {x:Static SystemColors.ActiveCaptionColorKey}}"/>
+                            </Border.BorderBrush>
+                            <Label Content="ECU LEAK TEST(MC34)" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" />
+                        </Border>
+                    </StackPanel>
+                </Border>
+            </Grid>
+        </Grid>
+        <!-- 왼쪽 중앙 메인 메뉴-->
+        <Grid Grid.Column="0" Grid.Row="1" Grid.RowSpan="3">
+            <GroupBox Header="Menu">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="270"/>
+                        <RowDefinition Height="50"/>
+                    </Grid.RowDefinitions>
+                    <StackPanel Grid.Row="0" Orientation="Vertical">
+                        <Button Margin="3,3,3,3" x:Name="Btn_USER" Click="Btn_USER_Click"  >
+                            <StackPanel Orientation="Horizontal">
+                                <iconPacks:PackIconMaterial Kind="Account" VerticalAlignment="Center" HorizontalAlignment="Left"/>
+                                <Label Content="USER" Width="120" HorizontalContentAlignment="Center" FontSize="14" />
+                            </StackPanel>
+                        </Button>
+                        <Button Margin="3,3,3,3" x:Name="Btn_OPEN">
+                            <StackPanel Orientation="Horizontal">
+                                <iconPacks:PackIconMaterial Kind="OpenInApp" VerticalAlignment="Center" HorizontalAlignment="Left"/>
+                                <Label Content="OPEN" Width="120" HorizontalContentAlignment="Center" FontSize="14" />
+                            </StackPanel>
+                        </Button>
+                        <Button Margin="3,3,3,3" x:Name="Btn_EDIT">
+                            <StackPanel Orientation="Horizontal">
+                                <iconPacks:PackIconMaterial Kind="Textbox" VerticalAlignment="Center" HorizontalAlignment="Left"/>
+                                <Label Content="EDIT" Width="120" HorizontalContentAlignment="Center" FontSize="14" />
+                            </StackPanel>
+                        </Button>
+                        <Button Margin="3,3,3,3" x:Name="Btn_TEST">
+                            <StackPanel Orientation="Horizontal">
+                                <iconPacks:PackIconMaterial Kind="Run" VerticalAlignment="Center" HorizontalAlignment="Left"/>
+                                <Label Content="TEST" Width="120" HorizontalContentAlignment="Center" FontSize="14" />
+                            </StackPanel>
+                        </Button>
+                        <Button Margin="3,3,3,3" x:Name="Btn_RESULT" Click="Btn_RESULT_Click" >
+                            <StackPanel Orientation="Horizontal">
+                                <iconPacks:PackIconMaterial Kind="ChartLine" VerticalAlignment="Center" HorizontalAlignment="Left"/>
+                                <Label Content="RESULT" Width="120" HorizontalContentAlignment="Center" FontSize="14" />
+                            </StackPanel>
+                        </Button>
+                        <Button Margin="3,3,3,3" x:Name="Btn_Log" Click="Btn_Log_Click">
+                            <StackPanel Orientation="Horizontal">
+                                <iconPacks:PackIconMaterial Kind="History" VerticalAlignment="Center" HorizontalAlignment="Left"/>
+                                <Label Content="LOG" Width="120" HorizontalContentAlignment="Center" FontSize="14" />
+                            </StackPanel>
+                        </Button>
+                        <Button Margin="3,3,3,3" x:Name="Btn_SELFTEST">
+                            <StackPanel Orientation="Horizontal">
+                                <iconPacks:PackIconMaterial Kind="Check" VerticalAlignment="Center" HorizontalAlignment="Left"/>
+                                <Label Content="SELF TEST" Width="120" HorizontalContentAlignment="Center" FontSize="14" />
+                            </StackPanel>
+                        </Button>
+                    </StackPanel>
+                    <StackPanel Grid.Row="1" Orientation="Vertical">
+                        <Border>
+                            <ProgressBar x:Name="Pb_Motor" VerticalAlignment="Top" Value="0"  Height="5"  Margin="2,0,2,0" Foreground="Red" SmallChange="0.01" />
+                        </Border>
+                        <Border>
+                            <StackPanel Orientation="Horizontal">
+                                <Label x:Name="MBC_Pos" Foreground="Green" Content=""/>
+                                <Label x:Name="MBC_Amp" Foreground="Green" Content=""/>
+                                <Label x:Name="MBC_ReadCheck" Foreground="Green" Content=""/>
+                                <Label x:Name="MBC_StopWatchTime" Foreground="Green" Content=""/>
+                            </StackPanel>
+
+                        </Border>
+                        <Border>
+                            <StackPanel Orientation="Horizontal">
+                                <Label Width="70" Content="PSU"/>
+                                <Label Width="80" HorizontalContentAlignment="Right" x:Name="L_CH0" Content="0.0"/>
+                                <Label Content="V"/>
+                            </StackPanel>
+                        </Border>
+                        <Border>
+                            <StackPanel Orientation="Horizontal">
+                                <Label Width="70" Content="PSU Amp"/>
+                                <Label Width="80" HorizontalContentAlignment="Right" x:Name="L_CH1" Content="0.0"/>
+                                <Label Content="A"/>
+                            </StackPanel>
+                        </Border>
+                        <Border>
+                            <StackPanel Orientation="Horizontal">
+                                <Label Width="50" Content="MC1,2"/>
+                                <Label Width="80" HorizontalContentAlignment="Right" x:Name="L_VAC1" Content="0.0"/>
+                                <Label Content="mmHg"/>
+                            </StackPanel>
+                        </Border>
+                        <Border>
+                            <StackPanel Orientation="Horizontal">
+                                <Label Width="50" Content="MC3,4"/>
+                                <Label Width="80" HorizontalContentAlignment="Right" x:Name="L_VAC2" Content="0.0"/>
+                                <Label Content="mmHg"/>
+                            </StackPanel>
+                        </Border>
+                        <Label Content="CPU" />
+                        <ProgressBar x:Name="Pb_CPU"  Height="6"  Margin="2,0,2,0"/>
+                        <Label Content="MEMORY" />
+                        <ProgressBar x:Name="Pb_MEMORY"  Height="6"  Margin="2,0,2,0"/>
+                        <Label Content="HDD" />
+                        <ProgressBar x:Name="Pb_HDD"  Height="6"  Margin="2,0,2,0"/>
+                    </StackPanel>
+                    <StackPanel Grid.Row="2" Orientation="Vertical">
+                        <Button Margin="3,3,3,3" x:Name="Btn_QUIT" Click="Btn_QUIT_Click" >
+                            <StackPanel Orientation="Horizontal">
+                                <iconPacks:PackIconMaterial Kind="Power" VerticalAlignment="Center" HorizontalAlignment="Left"/>
+                                <Label Content="QUIT" Width="120" HorizontalContentAlignment="Center" FontSize="14" />
+                            </StackPanel>
+                        </Button>
+                    </StackPanel>
+                </Grid>
+            </GroupBox>
+        </Grid>
+        <!-- 하단 상태창 표시-->
+        <Grid Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="4">
+            <DockPanel>
+                <StatusBar x:Name="SB_Main" >
+                    <StatusBarItem>
+                        <Border>
+                            <StackPanel x:Name="DAQ_Panel" Orientation="Horizontal">
+                                <iconPacks:PackIconMaterial  Width="12" Foreground="Gray" Kind="ChartLine" Margin="2,2,5,2"/>
+                                <TextBlock x:Name="SB_DAQ" Text="DAQ" />
+                            </StackPanel>
+                        </Border>
+                    </StatusBarItem>
+                    <StatusBarItem>
+                        <Border>
+                            <StackPanel Orientation="Horizontal">
+                                <iconPacks:PackIconMaterial Width="12" Foreground="Gray" Kind="EngineOutline" Margin="2,2,5,2"/>
+                                <TextBlock x:Name="SB_PLC" Text="PLC" />
+                            </StackPanel>
+                        </Border>
+                    </StatusBarItem>
+                    <StatusBarItem>
+                        <Border>
+                            <StackPanel Orientation="Horizontal">
+                                <iconPacks:PackIconMaterial  Width="12" Foreground="Gray" Kind="Matrix" Margin="2,2,5,2"/>
+                                <TextBlock x:Name="SB_COMPORT" Text="COM1" />
+                            </StackPanel>
+                        </Border>
+                    </StatusBarItem>
+                    <StatusBarItem>
+                        <TextBlock Width="40" VerticalAlignment="Center"  x:Name="SB_COMSTATE" Text="" />
+                    </StatusBarItem>
+                    <StatusBarItem>
+                        <Border>
+                            <StackPanel Orientation="Horizontal">
+                                <iconPacks:PackIconMaterial  Width="12" Foreground="Gray" Kind="Security" Margin="2,2,5,2"/>
+                                <TextBlock Width="40" VerticalAlignment="Center"  x:Name="SB_CAN" Text="CAN" />
+                            </StackPanel>
+                        </Border>
+                    </StatusBarItem>
+                    <Separator Foreground="Yellow" />
+                    <StatusBarItem>
+                        <TextBlock x:Name="SB_MODE" Text="MANUAL" >
+                            <TextBlock.Background>
+                                <SolidColorBrush Color="{DynamicResource {x:Static SystemColors.ActiveCaptionColorKey}}"/>
+                            </TextBlock.Background>
+                        </TextBlock>
+                    </StatusBarItem>
+                    <Separator Foreground="Yellow" />
+                    <StatusBarItem Foreground="Yellow">
+                        <TextBlock x:Name="SB_Msg" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+                    </StatusBarItem>
+                </StatusBar>
+            </DockPanel>
+        </Grid>
+        <!-- 중앙 그래프 표시 및 각종 서브창-->
+        <Grid Grid.Column="1" Grid.Row="1" Grid.RowSpan="3" x:Name="MainWorkGrid">
+            <TabControl x:Name="MainTab" >
+                <!-- No.0 외부 리크 테스트 -->
+                <TabItem >
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="140"/>
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="10"/>
+                        </Grid.ColumnDefinitions>
+                        <ni:Graph x:Name="ExtLeakGraph" RenderMode="Raster" Interactions="Zoom, ZoomHorizontal, ZoomVertical, ZoomIn, ZoomOut, Pan, PanHorizontal, PanVertical"
+							DataSource="{Binding GraphData}"  BorderThickness="2"  >
+                            <ni:Graph.Plots >
+                                <ni:Plot x:Name="Ext_P_TestP" AdjustVerticalScale="False" Label="Test Vacuum" VerticalScale="{Binding ElementName=Ext_TestPressure}"  HorizontalScale="{Binding ElementName=Ext_Time}">
+                                    <ni:PointPlotRenderer Fill="Green" Shape="Cross" Stroke="Green" Size="2,2" />
+                                </ni:Plot>
+                                <ni:Plot x:Name="Ext_P_LeakP" AdjustVerticalScale="False" Label="Leak Vacuum" VerticalScale="{Binding ElementName=Ext_LeakPressure}" HorizontalScale="{Binding ElementName=Ext_Time}">
+                                    <ni:LinePlotRenderer Stroke="Red" StrokeThickness="4"/>
+                                </ni:Plot>
+                            </ni:Graph.Plots>
+                            <ni:Graph.Axes>
+                                <ni:AxisDouble x:Name="Ext_Time"         Range="0.0,20.0"   Orientation="Horizontal" Label="시험시간(초)"  >
+                                    <ni:AxisDouble.LabelTemplate>
+                                        <DataTemplate>
+                                            <TextBlock Text="{Binding}" FontSize="14" Foreground="Blue"/>
+                                        </DataTemplate>
+                                    </ni:AxisDouble.LabelTemplate>
+                                    <ni:AxisDouble.MajorDivisions>
+                                        <ni:RangeLabeledDivisions LabelBrush="Blue" Mode="Count: 10">
+                                            <ni:RangeLabeledDivisions.LabelPresenter>
+                                                <ni:GeneralValueFormatter Format="N1" ShortFormat="{x:Null}"/>
+                                            </ni:RangeLabeledDivisions.LabelPresenter>
+                                        </ni:RangeLabeledDivisions>
+                                    </ni:AxisDouble.MajorDivisions>
+                                </ni:AxisDouble>
+                                <ni:AxisDouble x:Name="Ext_TestPressure" Range="0.0,750.0"  Orientation="Vertical"   Label="시험압(mmHg)" >
+                                    <ni:AxisDouble.LabelTemplate>
+                                        <DataTemplate>
+                                            <TextBlock Text="{Binding}" FontSize="16" Foreground="Green"/>
+                                        </DataTemplate>
+                                    </ni:AxisDouble.LabelTemplate>
+                                    <ni:AxisDouble.MinorDivisions>
+                                        <ni:RangeDivisions/>
+                                    </ni:AxisDouble.MinorDivisions>
+                                    <ni:AxisDouble.MajorDivisions>
+                                        <ni:RangeLabeledDivisions LabelBrush="Green" Mode="Count: 7" >
+                                            <ni:RangeLabeledDivisions.LabelPresenter>
+                                                <ni:GeneralValueFormatter Format="N1" ShortFormat="{x:Null}"/>
+                                            </ni:RangeLabeledDivisions.LabelPresenter>
+                                        </ni:RangeLabeledDivisions>
+                                    </ni:AxisDouble.MajorDivisions>
+                                </ni:AxisDouble>
+                                <ni:AxisDouble x:Name="Ext_LeakPressure" Range="0.0,10.0"   Orientation="Vertical"   Label="누설량(mmHg)" >
+                                    <ni:AxisDouble.LabelTemplate>
+                                        <DataTemplate>
+                                            <TextBlock Text="{Binding}" FontSize="16" Foreground="Red"/>
+                                        </DataTemplate>
+                                    </ni:AxisDouble.LabelTemplate>
+                                    <ni:AxisDouble.MajorDivisions>
+                                        <ni:RangeLabeledDivisions LabelBrush="Red" TickBrush="Red" TickMark="Ellipse" LabelOrientation="None" Mode="Count: 5" >
+                                            <ni:RangeLabeledDivisions.LabelPresenter>
+                                                <ni:GeneralValueFormatter Format="N1" ShortFormat="{x:Null}"/>
+                                            </ni:RangeLabeledDivisions.LabelPresenter>
+                                        </ni:RangeLabeledDivisions>
+                                    </ni:AxisDouble.MajorDivisions>
+                                </ni:AxisDouble>
+                            </ni:Graph.Axes>
+                            <ni:Graph.Children>
+                                <ni:MultiPlotCursor x:Name="EXT_Leak" Label="Check" CrosshairBrush="Blue" Foreground="Blue" TargetBrush="Red" Cursor="Hand" LabelVisibility="Visible" TargetShape="Plus" TargetSize="25,25"  >
+                                    <ni:MultiPlotCursor.AxisValue>
+                                        <System:Double>5</System:Double>
+                                    </ni:MultiPlotCursor.AxisValue>
+                                    <ni:MultiPlotCursor.ValuePresenter>
+                                        <ni:ValueFormatterGroup>
+                                            <ni:ValueFormatterGroup.DefaultFormatter>
+                                                <ni:GeneralValueFormatter x:Name="VF_ELeak" Format="N2" FontSize="20" FontStretch="UltraExpanded" FontStyle="Normal" FontWeight="Bold" ShortFormat="" Background="#FF6E1A1A" FrameworkElement.FlowDirection="RightToLeft" FontFamily="Century"/>
+                                            </ni:ValueFormatterGroup.DefaultFormatter>
+                                        </ni:ValueFormatterGroup>
+                                    </ni:MultiPlotCursor.ValuePresenter>
+                                </ni:MultiPlotCursor>
+                            </ni:Graph.Children>
+                        </ni:Graph>
+                        <Border Grid.Column="0" Grid.ColumnSpan="1" Grid.Row="1"  Margin="2,2,2,2">
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="40"/>
+                                    <RowDefinition Height="30"/>
+                                    <RowDefinition Height="30"/>
+                                    <RowDefinition Height="30"/>
+
+                                </Grid.RowDefinitions>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="200"/>
+                                    <ColumnDefinition Width="200"/>
+                                    <ColumnDefinition Width="200"/>
+                                    <ColumnDefinition Width="200"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <!--
+                                <Grid.Triggers>
+                                    <EventTrigger RoutedEvent="Grid.Loaded">
+                                        <BeginStoryboard>
+                                            <Storyboard>
+                                                <DoubleAnimation From="10" To="0" Duration="00:00:02" AutoReverse="True" RepeatBehavior="Forever"
+                                                    Storyboard.TargetName="blurEffect" 
+                                                    Storyboard.TargetProperty="Radius">                                                    
+                                                </DoubleAnimation>
+                                            </Storyboard>
+                                        </BeginStoryboard>
+                                    </EventTrigger>
+                                </Grid.Triggers>
+                                -->
+                                <Border Grid.Column="0" Grid.ColumnSpan="5" Grid.Row="0" Margin="1,1,1,1" >
+                                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                                        <iconPacks:PackIconMaterial  Kind="Adjust" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                                        <Label Content="iMEB ASS'Y 외부 리크 " VerticalContentAlignment="Center" HorizontalContentAlignment="Center" FontSize="24" FontStyle="Italic" FontWeight="ExtraBlack" FlowDirection="RightToLeft">
+                                            <!--
+                                            <Label.Effect>
+                                                <BlurEffect Radius="10" x:Name="blurEffect"/>
+                                            </Label.Effect>
+                                            -->
+                                        </Label>
+                                    </StackPanel>
+                                </Border>
+
+                                <Border Grid.Column="0" Grid.Row="1" Margin="1,1,1,1" BorderThickness="1" BorderBrush="Gray">
+                                    <Label Content="시험압(mmHg)" VerticalContentAlignment="Center" HorizontalContentAlignment="Center"/>
+                                </Border>
+                                <Border Grid.Column="0" Grid.Row="2" Grid.RowSpan="2" Margin="1,1,1,1">
+                                    <Label x:Name="LTV_TestPressure" Content="000.0" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" FontSize="22" Foreground="Blue" FontWeight="Bold" />
+                                </Border>
+
+                                <Border Grid.Column="1" Grid.Row="1" Margin="1,1,1,1" BorderThickness="1" BorderBrush="Gray">
+                                    <Label Content="누설량 기준" VerticalContentAlignment="Center" HorizontalContentAlignment="Center"/>
+                                </Border>
+
+                                <Border Grid.Column="1" Grid.Row="2"  Margin="1,1,1,1">
+                                    <StackPanel Orientation="Horizontal">
+                                        <iconPacks:PackIconMaterial Kind="Upload" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                                        <Label Content="최대" Width="50" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" />
+                                        <Label x:Name="LTV_LeakMax" Content="3.75" Width="60" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" />
+                                        <Label Content="mmHg" VerticalContentAlignment="Center" />
+                                    </StackPanel>
+                                </Border>
+                                <Border Grid.Column="1" Grid.Row="3"  Margin="1,1,1,1">
+                                    <StackPanel Orientation="Horizontal">
+                                        <iconPacks:PackIconMaterial Kind="Download" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                                        <Label Content="최소" Width="50" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" />
+                                        <Label x:Name="LTV_LeakMin" Content="0.00" Width="60" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" />
+                                        <Label Content="mmHg" VerticalContentAlignment="Center" />
+                                    </StackPanel>
+                                </Border>
+
+                                <Border Grid.Column="2" Grid.Row="1" Margin="1,1,1,1" BorderThickness="1" BorderBrush="Gray">
+                                    <Label Content="측정결과 누설량(mmHg)" VerticalContentAlignment="Center" HorizontalContentAlignment="Center"/>
+                                </Border>
+                                <Border Grid.Column="2" Grid.Row="2" Grid.RowSpan="2" Margin="1,1,1,1">
+                                    <Label x:Name="LTV_Leak" Content="0.00" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" FontSize="22" Foreground="Blue" FontWeight="Bold" />
+                                </Border>
+
+                                <Border Grid.Column="3" Grid.Row="1" Margin="1,1,1,1" BorderThickness="1" BorderBrush="Gray">
+                                    <Label Content="시험시간(초)" VerticalContentAlignment="Center" HorizontalContentAlignment="Center"/>
+                                </Border>
+                                <Border Grid.Column="3" Grid.Row="2" Grid.RowSpan="2" Margin="1,1,1,1">
+                                    <Label x:Name="LTV_TestTime" Content="0.0" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" FontSize="22" Foreground="Blue" FontWeight="Bold" />
+                                </Border>
+
+                                <Border Grid.Column="4" Grid.Row="1" Margin="1,1,1,1" BorderThickness="1" BorderBrush="Gray">
+                                    <Label Content="시험판정" VerticalContentAlignment="Center" HorizontalContentAlignment="Center"/>
+                                </Border>
+                                <Border Grid.Column="4" Grid.Row="2" Grid.RowSpan="2" Margin="1,1,1,1">
+                                    <Label x:Name="LTV_Result" Content="OK" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" FontSize="32" Foreground="Blue" FontWeight="Bold" />
+                                </Border>
+
+
+                            </Grid>
+                        </Border>
+                    </Grid>
+                </TabItem>
+                <!-- No.1 내부 리크 테스트 1.5Bar-->
+                <TabItem Visibility="Hidden">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="140"/>
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="10"/>
+                        </Grid.ColumnDefinitions>
+
+                        <ni:Graph x:Name="IntLeakGraph" RenderMode="Raster" Interactions="Zoom, ZoomHorizontal, ZoomVertical, ZoomIn, ZoomOut, Pan, PanHorizontal, PanVertical"
+							DataSource="{Binding GraphData1}"  BorderThickness="2"  >
+                            <ni:Graph.Plots >
+                                <ni:Plot x:Name="In_P_TestP" AdjustVerticalScale="False" Label="Test Vacuum" VerticalScale="{Binding ElementName=In_TestPressure}"  HorizontalScale="{Binding ElementName=In_Time}">
+                                    <ni:PointPlotRenderer Fill="Green" Shape="Cross" Stroke="Green" Size="2,2" />
+                                </ni:Plot>
+                                <ni:Plot x:Name="In_P_LeakP" AdjustVerticalScale="False" Label="Leak Vacuum" VerticalScale="{Binding ElementName=In_LeakPressure}" HorizontalScale="{Binding ElementName=In_Time}">
+                                    <ni:LinePlotRenderer Stroke="Red" StrokeThickness="4"/>
+                                </ni:Plot>
+                            </ni:Graph.Plots>
+                            <ni:Graph.Axes>
+                                <ni:AxisDouble x:Name="In_Time"         Range="0.0,20.0"   Orientation="Horizontal" Label="시험시간(초)"  >
+                                    <ni:AxisDouble.LabelTemplate>
+                                        <DataTemplate>
+                                            <TextBlock Text="{Binding}" FontSize="14" Foreground="Blue"/>
+                                        </DataTemplate>
+                                    </ni:AxisDouble.LabelTemplate>
+                                    <ni:AxisDouble.MajorDivisions>
+                                        <ni:RangeLabeledDivisions LabelBrush="Blue" Mode="Count: 10">
+                                            <ni:RangeLabeledDivisions.LabelPresenter>
+                                                <ni:GeneralValueFormatter Format="N1" ShortFormat="{x:Null}"/>
+                                            </ni:RangeLabeledDivisions.LabelPresenter>
+                                        </ni:RangeLabeledDivisions>
+                                    </ni:AxisDouble.MajorDivisions>
+                                </ni:AxisDouble>
+                                <ni:AxisDouble x:Name="In_TestPressure" Range="0.0,2.0"  Orientation="Vertical"   Label="시험압(bar)" >
+                                    <ni:AxisDouble.LabelTemplate>
+                                        <DataTemplate>
+                                            <TextBlock Text="{Binding}" FontSize="16" Foreground="Green"/>
+                                        </DataTemplate>
+                                    </ni:AxisDouble.LabelTemplate>
+                                    <ni:AxisDouble.MinorDivisions>
+                                        <ni:RangeDivisions/>
+                                    </ni:AxisDouble.MinorDivisions>
+                                    <ni:AxisDouble.MajorDivisions>
+                                        <ni:RangeLabeledDivisions LabelBrush="Green" Mode="Count: 7" >
+                                            <ni:RangeLabeledDivisions.LabelPresenter>
+                                                <ni:GeneralValueFormatter Format="N1" ShortFormat="{x:Null}"/>
+                                            </ni:RangeLabeledDivisions.LabelPresenter>
+                                        </ni:RangeLabeledDivisions>
+                                    </ni:AxisDouble.MajorDivisions>
+                                </ni:AxisDouble>
+                                <ni:AxisDouble x:Name="In_LeakPressure" Range="0.0,10.0"   Orientation="Vertical"   Label="누설량(mbar)" >
+                                    <ni:AxisDouble.LabelTemplate>
+                                        <DataTemplate>
+                                            <TextBlock Text="{Binding}" FontSize="16" Foreground="Red"/>
+                                        </DataTemplate>
+                                    </ni:AxisDouble.LabelTemplate>
+                                    <ni:AxisDouble.MajorDivisions>
+                                        <ni:RangeLabeledDivisions LabelBrush="Red" TickBrush="Red" TickMark="Ellipse" LabelOrientation="None" Mode="Count: 5" >
+                                            <ni:RangeLabeledDivisions.LabelPresenter>
+                                                <ni:GeneralValueFormatter Format="N1" ShortFormat="{x:Null}"/>
+                                            </ni:RangeLabeledDivisions.LabelPresenter>
+                                        </ni:RangeLabeledDivisions>
+                                    </ni:AxisDouble.MajorDivisions>
+                                </ni:AxisDouble>
+                            </ni:Graph.Axes>
+                            <ni:Graph.Children>
+                                <ni:MultiPlotCursor x:Name="INT_Leak15" Label="Check" CrosshairBrush="Blue" Foreground="Blue" TargetBrush="Red" Cursor="Hand" LabelVisibility="Visible" TargetShape="Plus" TargetSize="25,25"  >
+                                    <ni:MultiPlotCursor.AxisValue>
+                                        <System:Double>5</System:Double>
+                                    </ni:MultiPlotCursor.AxisValue>
+                                    <ni:MultiPlotCursor.ValuePresenter>
+                                        <ni:ValueFormatterGroup>
+                                            <ni:ValueFormatterGroup.DefaultFormatter>
+                                                <ni:GeneralValueFormatter x:Name="VF_ILeak15" Format="N2" FontSize="20" FontStretch="UltraExpanded" FontStyle="Normal" FontWeight="Bold" ShortFormat="" Background="#FF6E1A1A" FrameworkElement.FlowDirection="RightToLeft" FontFamily="Century"/>
+                                            </ni:ValueFormatterGroup.DefaultFormatter>
+                                        </ni:ValueFormatterGroup>
+                                    </ni:MultiPlotCursor.ValuePresenter>
+                                </ni:MultiPlotCursor>
+                            </ni:Graph.Children>
+                        </ni:Graph>
+                        <Border Grid.Column="0" Grid.ColumnSpan="1" Grid.Row="1"  Margin="2,2,2,2">
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="40"/>
+                                    <RowDefinition Height="30"/>
+                                    <RowDefinition Height="30"/>
+                                    <RowDefinition Height="30"/>
+
+                                </Grid.RowDefinitions>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="200"/>
+                                    <ColumnDefinition Width="200"/>
+                                    <ColumnDefinition Width="200"/>
+                                    <ColumnDefinition Width="200"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <Border Grid.Column="0" Grid.ColumnSpan="5" Grid.Row="0" Margin="1,1,1,1" >
+                                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                                        <iconPacks:PackIconMaterial  Kind="Adjust" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                                        <Label Content="iMEB ASS'Y 내부 리크 " VerticalContentAlignment="Center" HorizontalContentAlignment="Center" FontSize="24" FontStyle="Italic" FontWeight="ExtraBlack"/>
+                                    </StackPanel>
+                                </Border>
+
+                                <Border Grid.Column="0" Grid.Row="1" Margin="1,1,1,1" BorderThickness="1" BorderBrush="Gray">
+                                    <Label Content="시험압(bar)" VerticalContentAlignment="Center" HorizontalContentAlignment="Center"/>
+                                </Border>
+                                <Border Grid.Column="0" Grid.Row="2" Grid.RowSpan="2" Margin="1,1,1,1">
+                                    <Label x:Name="LT15_TestPressure" Content="0.0" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" FontSize="22" Foreground="Blue" FontWeight="Bold" />
+                                </Border>
+
+                                <Border Grid.Column="1" Grid.Row="1" Margin="1,1,1,1" BorderThickness="1" BorderBrush="Gray">
+                                    <Label Content="누설량 기준" VerticalContentAlignment="Center" HorizontalContentAlignment="Center"/>
+                                </Border>
+
+                                <Border Grid.Column="1" Grid.Row="2"  Margin="1,1,1,1">
+                                    <StackPanel Orientation="Horizontal">
+                                        <iconPacks:PackIconMaterial Kind="Upload" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                                        <Label Content="최대" Width="50" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" />
+                                        <Label x:Name="LT15_LeakMax" Content="10.0" Width="60" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" />
+                                        <Label Content="mbar" VerticalContentAlignment="Center" />
+                                    </StackPanel>
+                                </Border>
+                                <Border Grid.Column="1" Grid.Row="3"  Margin="1,1,1,1">
+                                    <StackPanel Orientation="Horizontal">
+                                        <iconPacks:PackIconMaterial Kind="Download" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                                        <Label Content="최소" Width="50" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" />
+                                        <Label x:Name="LT15_LeakMin" Content="0.00" Width="60" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" />
+                                        <Label Content="mbar" VerticalContentAlignment="Center" />
+                                    </StackPanel>
+                                </Border>
+
+                                <Border Grid.Column="2" Grid.Row="1" Margin="1,1,1,1" BorderThickness="1" BorderBrush="Gray">
+                                    <Label Content="측정결과 누설량(mbar)" VerticalContentAlignment="Center" HorizontalContentAlignment="Center"/>
+                                </Border>
+                                <Border Grid.Column="2" Grid.Row="2" Grid.RowSpan="2" Margin="1,1,1,1">
+                                    <Label x:Name="LT15_Leak" Content="0.000" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" FontSize="22" Foreground="Blue" FontWeight="Bold" />
+                                </Border>
+
+                                <Border Grid.Column="3" Grid.Row="1" Margin="1,1,1,1" BorderThickness="1" BorderBrush="Gray">
+                                    <Label Content="시험시간(초)" VerticalContentAlignment="Center" HorizontalContentAlignment="Center"/>
+                                </Border>
+                                <Border Grid.Column="3" Grid.Row="2" Grid.RowSpan="2" Margin="1,1,1,1">
+                                    <Label x:Name="LT15_TestTime" Content="0.0" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" FontSize="22" Foreground="Blue" FontWeight="Bold" />
+                                </Border>
+
+                                <Border Grid.Column="4" Grid.Row="1" Margin="1,1,1,1" BorderThickness="1" BorderBrush="Gray">
+                                    <Label Content="시험판정" VerticalContentAlignment="Center" HorizontalContentAlignment="Center"/>
+                                </Border>
+                                <Border Grid.Column="4" Grid.Row="2" Grid.RowSpan="2" Margin="1,1,1,1">
+                                    <Label x:Name="LT15_Result" Content="OK" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" FontSize="32" Foreground="Blue" FontWeight="Bold" />
+                                </Border>
+
+
+                            </Grid>
+                        </Border>
+
+                    </Grid>
+                </TabItem>
+                <!-- No.2 ECU DTC 테스트-->
+                <TabItem>
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="1*"/>
+                            <RowDefinition Height="1*"/>
+                            <RowDefinition Height="140"/>
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="10"/>
+                        </Grid.ColumnDefinitions>
+                        <DataGrid Grid.Column="0"  Grid.Row="0" 
+							x:Name="EcuDtcGrid" Margin="5,10,5,5" 
+							AutoGenerateColumns="False"
+							Style="{StaticResource AzureDataGrid}" CanUserReorderColumns="False" CanUserSortColumns="False" 
+                                  >
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Header="DTC"          Binding="{Binding DTC}"         IsReadOnly="True" Width="220"/>
+                                <DataGridTextColumn Header="STATUS"       Binding="{Binding Status}"      IsReadOnly="True" Width="70"/>
+                                <DataGridTextColumn Header="설명"         Binding="{Binding Description}" IsReadOnly="True" Width="500"/>
+                                <DataGridTextColumn Header="CAN(LowData)" Binding="{Binding LowData}"     IsReadOnly="True" Width="400"/>
+                            </DataGrid.Columns>
+                        </DataGrid>
+                        <Grid Grid.Column="0" Grid.Row="1">
+                            <Border BorderBrush="Blue" BorderThickness="1">
+                                <StackPanel Orientation="Vertical">
+                                    <TextBox x:Name="TB_Msg0" FontSize="12"  FontFamily="Arial Black"/>
+                                    <TextBox x:Name="TB_Msg1" FontSize="12"  FontFamily="Arial Black"/>
+                                    <TextBox x:Name="TB_Msg2" FontSize="12"  FontFamily="Arial Black"/>
+                                    <TextBox x:Name="TB_Msg3" FontSize="12"  FontFamily="Arial Black"/>
+                                    <TextBox x:Name="TB_Msg4" FontSize="12"  FontFamily="Arial Black"/>
+                                    <TextBox x:Name="TB_Msg5" FontSize="12"  FontFamily="Arial Black"/>
+                                    <TextBox x:Name="TB_Msg6" FontSize="12"  FontFamily="Arial Black"/>
+                                    <TextBox x:Name="TB_Msg7" FontSize="12"  FontFamily="Arial Black"/>
+                                    <TextBox x:Name="TB_Msg8" FontSize="12"  FontFamily="Arial Black"/>
+                                    <TextBox x:Name="TB_Msg9" FontSize="12"  FontFamily="Arial Black"/>
+                                    <TextBox x:Name="TB_Msg10" FontSize="12" FontFamily="Arial Black"/>
+                                    <TextBox x:Name="TB_Msg11" FontSize="12" FontFamily="Arial Black"/>
+                                </StackPanel>
+                            </Border>
+                        </Grid>
+
+                        <Border Grid.Column="0" Grid.ColumnSpan="1" Grid.Row="2"  Margin="2,2,2,2">
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="40"/>
+                                    <RowDefinition Height="30"/>
+                                    <RowDefinition Height="30"/>
+                                    <RowDefinition Height="30"/>
+
+                                </Grid.RowDefinitions>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="200"/>
+                                    <ColumnDefinition Width="200"/>
+                                    <ColumnDefinition Width="200"/>
+                                    <ColumnDefinition Width="200"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <Border Grid.Column="0" Grid.ColumnSpan="5" Grid.Row="0" Margin="1,1,1,1" >
+                                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                                        <iconPacks:PackIconMaterial  Kind="CarConnected" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                                        <Label Content="iMEB ASS'Y DTC VERIFY " VerticalContentAlignment="Center" HorizontalContentAlignment="Center" FontSize="24" FontStyle="Italic" FontWeight="ExtraBlack"/>
+                                    </StackPanel>
+                                </Border>
+
+                                <Border Grid.Column="0" Grid.Row="1" Margin="1,1,1,1" BorderThickness="1" BorderBrush="Gray">
+                                    <Label Content="ECU 전압(V)" VerticalContentAlignment="Center" HorizontalContentAlignment="Center"/>
+                                </Border>
+                                <Border Grid.Column="0" Grid.Row="2" Grid.RowSpan="2" Margin="1,1,1,1">
+                                    <Label x:Name="DTC_PSUVoltage" Content="14.0" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" FontSize="22" Foreground="Blue" FontWeight="Bold" />
+                                </Border>
+
+                                <Border Grid.Column="1" Grid.Row="1" Margin="1,1,1,1" BorderThickness="1" BorderBrush="Gray">
+                                    <Label Content="Ignore Counts" VerticalContentAlignment="Center" HorizontalContentAlignment="Center"/>
+                                </Border>
+                                <Border Grid.Column="1" Grid.Row="2" Grid.RowSpan="2" Margin="1,1,1,1">
+                                    <Label x:Name="IgnoreCount" Content="0" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" FontSize="22" Foreground="Blue" FontWeight="Bold" />
+                                </Border>
+
+
+                                <Border Grid.Column="2" Grid.Row="1" Margin="1,1,1,1" BorderThickness="1" BorderBrush="Gray">
+                                    <Label Content="Read Counts" VerticalContentAlignment="Center" HorizontalContentAlignment="Center"/>
+                                </Border>
+                                <Border Grid.Column="2" Grid.Row="2" Grid.RowSpan="2" Margin="1,1,1,1">
+                                    <Label x:Name="ReadCount" Content="0" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" FontSize="22" Foreground="Blue" FontWeight="Bold" />
+                                </Border>
+
+                                <Border Grid.Column="3" Grid.Row="1" Margin="1,1,1,1" BorderThickness="1" BorderBrush="Gray">
+                                    <Label Content="시험시간(초)" VerticalContentAlignment="Center" HorizontalContentAlignment="Center"/>
+                                </Border>
+                                <Border Grid.Column="3" Grid.Row="2" Grid.RowSpan="2" Margin="1,1,1,1">
+                                    <Label x:Name="DTCTestTime"  Content="0.0" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" FontSize="22" Foreground="Blue" FontWeight="Bold" />
+                                </Border>
+
+                                <Border Grid.Column="4" Grid.Row="1" Margin="1,1,1,1" BorderThickness="1" BorderBrush="Gray">
+                                    <Label Content="시험판정" VerticalContentAlignment="Center" HorizontalContentAlignment="Center"/>
+                                </Border>
+                                <Border Grid.Column="4" Grid.Row="2" Grid.RowSpan="2" Margin="1,1,1,1">
+                                    <Label x:Name="DTCResultMsg" Content="OK" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" FontSize="32" Foreground="Blue" FontWeight="Bold" />
+                                </Border>
+
+
+                            </Grid>
+                        </Border>
+
+
+                    </Grid>
+                </TabItem>
+                <!-- No.3 ECU MOTOR LEAK 테스트-->
+                <TabItem>
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="20"/>
+                            <RowDefinition Height="150"/>
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="10"/>
+                        </Grid.ColumnDefinitions>
+                        <!-- GRAPH -->
+                        <ni:Graph x:Name="EcuMotorGraph" RenderMode="Raster" Interactions="Zoom, ZoomHorizontal, ZoomVertical, ZoomIn, ZoomOut, Pan, PanHorizontal, PanVertical"
+							DataSource="{Binding GraphData}"  BorderThickness="2"
+							IsTabStop="False" PreferIndexData="False" PlotAreaBackground="White" PlotAreaBorderBrush="#FFECE8E8" SelectionStroke="#FF0EC348">
+                            <ni:Graph.Plots>
+                                <ni:Plot x:Name="P_Current" AdjustVerticalScale="False" Label="Current" VerticalScale="{Binding ElementName=CurrentAxisY}"  HorizontalScale="{Binding ElementName=TimeAxis}">
+                                    <ni:LinePlotRenderer Stroke="Red" StrokeThickness="4" />
+                                </ni:Plot>
+                                <ni:Plot x:Name="P_Position" AdjustVerticalScale="False" Label="Position" VerticalScale="{Binding ElementName=PositionAxisY}" HorizontalScale="{Binding ElementName=TimeAxis}">
+                                    <ni:LinePlotRenderer Stroke="Blue" StrokeThickness="4"/>
+                                </ni:Plot>
+                                <ni:Plot x:Name="P_MC12" AdjustVerticalScale="False" Label="VAC1" VerticalScale="{Binding ElementName=VacuumAxisY}" HorizontalScale="{Binding ElementName=TimeAxis}">
+                                    <ni:LinePlotRenderer Stroke="#FF04FD26" StrokeThickness="4"/>
+                                </ni:Plot>
+                                <ni:Plot x:Name="P_MC24" AdjustVerticalScale="False" Label="VAC2" VerticalScale="{Binding ElementName=VacuumAxisY}" HorizontalScale="{Binding ElementName=TimeAxis}">
+                                    <ni:LinePlotRenderer Stroke="#FF04FD26" StrokeThickness="4"/>
+                                </ni:Plot>
+                            </ni:Graph.Plots>
+                            <ni:Graph.Axes>
+                                <ni:AxisDouble x:Name="TimeAxis" Range="0.0,100.0" Orientation="Horizontal" Label="시험시간(초)">
+                                    <ni:AxisDouble.LabelTemplate>
+                                        <DataTemplate>
+                                            <TextBlock Text="{Binding}" FontSize="14" Foreground="Blue"/>
+                                        </DataTemplate>
+                                    </ni:AxisDouble.LabelTemplate>
+                                    <ni:AxisDouble.MajorDivisions>
+                                        <ni:RangeLabeledDivisions LabelBrush="Blue" Mode="Count: 10">
+                                            <ni:RangeLabeledDivisions.LabelPresenter>
+                                                <ni:GeneralValueFormatter Format="N1" ShortFormat="{x:Null}"/>
+                                            </ni:RangeLabeledDivisions.LabelPresenter>
+                                        </ni:RangeLabeledDivisions>
+                                    </ni:AxisDouble.MajorDivisions>
+                                </ni:AxisDouble>
+                                <ni:AxisDouble x:Name="CurrentAxisY" Range="-10.0,10.0"  Orientation="Vertical"   Label="모터전류(A)">
+                                    <ni:AxisDouble.LabelTemplate>
+                                        <DataTemplate>
+                                            <TextBlock Text="{Binding}" FontSize="16" Foreground="Red"/>
+                                        </DataTemplate>
+                                    </ni:AxisDouble.LabelTemplate>
+                                    <ni:AxisDouble.MinorDivisions>
+                                        <ni:RangeDivisions/>
+                                    </ni:AxisDouble.MinorDivisions>
+                                    <ni:AxisDouble.MajorDivisions>
+                                        <ni:RangeLabeledDivisions LabelBrush="Red" Mode="Count: 5" >
+                                            <ni:RangeLabeledDivisions.LabelPresenter>
+                                                <ni:GeneralValueFormatter Format="N1" ShortFormat="{x:Null}"/>
+                                            </ni:RangeLabeledDivisions.LabelPresenter>
+                                        </ni:RangeLabeledDivisions>
+                                    </ni:AxisDouble.MajorDivisions>
+                                </ni:AxisDouble>
+                                <ni:AxisDouble x:Name="PositionAxisY" Range="0.0,35.0"  Orientation="Vertical"   Label="위치(mm)">
+                                    <ni:AxisDouble.LabelTemplate>
+                                        <DataTemplate>
+                                            <TextBlock Text="{Binding}" FontSize="16" Foreground="Blue"/>
+                                        </DataTemplate>
+                                    </ni:AxisDouble.LabelTemplate>
+                                    <ni:AxisDouble.MajorDivisions>
+                                        <ni:RangeLabeledDivisions LabelBrush="Blue" TickBrush="Blue" TickMark="Ellipse" LabelOrientation="None" Mode="Count: 8" >
+                                            <ni:RangeLabeledDivisions.LabelPresenter>
+                                                <ni:GeneralValueFormatter Format="N1" ShortFormat="{x:Null}"/>
+                                            </ni:RangeLabeledDivisions.LabelPresenter>
+                                        </ni:RangeLabeledDivisions>
+                                    </ni:AxisDouble.MajorDivisions>
+                                </ni:AxisDouble>
+                                <ni:AxisDouble x:Name="VacuumAxisY" Range="0.0,750.0"  Orientation="Vertical"   Label="Vacuum(mmH)">
+                                    <ni:AxisDouble.LabelTemplate>
+                                        <DataTemplate>
+                                            <TextBlock Text="{Binding}" FontSize="16" Foreground="#FF04FD26"/>
+                                        </DataTemplate>
+                                    </ni:AxisDouble.LabelTemplate>
+                                    <ni:AxisDouble.MajorDivisions>
+                                        <ni:RangeLabeledDivisions LabelBrush="#FF04FD26" TickBrush="#FF04FD26" TickMark="Ellipse" LabelOrientation="None" Mode="Count: 8" >
+                                            <ni:RangeLabeledDivisions.LabelPresenter>
+                                                <ni:GeneralValueFormatter Format="N1" ShortFormat="{x:Null}"/>
+                                            </ni:RangeLabeledDivisions.LabelPresenter>
+                                        </ni:RangeLabeledDivisions>
+                                    </ni:AxisDouble.MajorDivisions>
+                                </ni:AxisDouble>
+                            </ni:Graph.Axes>
+                            <ni:Graph.Children>
+                                <ni:MultiPlotCursor x:Name="CFWD_S1" Label="FWD" CrosshairBrush="#FFEA2F2F" Foreground="#FFF33F3F" TargetBrush="#FFD16969" Cursor="Hand" LabelVisibility="Visible" TargetShape="OutwardTriangle" TargetSize="15,15"  >
+                                    <ni:MultiPlotCursor.AxisValue>
+                                        <System:Double>5</System:Double>
+                                    </ni:MultiPlotCursor.AxisValue>
+                                    <ni:MultiPlotCursor.ValuePresenter>
+                                        <ni:ValueFormatterGroup>
+                                            <ni:ValueFormatterGroup.DefaultFormatter>
+                                                <ni:GeneralValueFormatter x:Name="valueFormatter" Format="N1" FontSize="20" FontStretch="UltraExpanded" FontStyle="Normal" FontWeight="Bold" ShortFormat="" Background="#FF6E1A1A" FrameworkElement.FlowDirection="RightToLeft" FontFamily="Century"/>
+                                            </ni:ValueFormatterGroup.DefaultFormatter>
+                                        </ni:ValueFormatterGroup>
+                                    </ni:MultiPlotCursor.ValuePresenter>
+                                </ni:MultiPlotCursor>
+                                <ni:MultiPlotCursor x:Name="CFWD_S2" Label="FWD" CrosshairBrush="#FFEA2F2F" Foreground="#FFF33F3F" TargetBrush="#FFD16969" Cursor="Hand" LabelVisibility="Visible" TargetShape="OutwardTriangle" TargetSize="15,15"  >
+                                    <ni:MultiPlotCursor.AxisValue>
+                                        <System:Double>7</System:Double>
+                                    </ni:MultiPlotCursor.AxisValue>
+                                    <ni:MultiPlotCursor.ValuePresenter>
+                                        <ni:ValueFormatterGroup>
+                                            <ni:ValueFormatterGroup.DefaultFormatter>
+                                                <ni:GeneralValueFormatter x:Name="valueFormatter1" Format="N1" FontSize="20" FontStretch="UltraExpanded" FontStyle="Normal" FontWeight="Bold" ShortFormat="" Background="#FFF0EBEB" FrameworkElement.FlowDirection="RightToLeft" FontFamily="Century"/>
+                                            </ni:ValueFormatterGroup.DefaultFormatter>
+                                        </ni:ValueFormatterGroup>
+                                    </ni:MultiPlotCursor.ValuePresenter>
+                                </ni:MultiPlotCursor>
+                                <ni:MultiPlotCursor x:Name="CBWD_S1" Label="BWD" CrosshairBrush="#FF066BFD" Foreground="#FF084AFB" TargetBrush="#FF0A4BF9" Cursor="Hand" LabelVisibility="Visible" TargetShape="InwardTriangle" TargetSize="15,15"  >
+                                    <ni:MultiPlotCursor.AxisValue>
+                                        <System:Double>9</System:Double>
+                                    </ni:MultiPlotCursor.AxisValue>
+                                    <ni:MultiPlotCursor.ValuePresenter>
+                                        <ni:ValueFormatterGroup>
+                                            <ni:ValueFormatterGroup.DefaultFormatter>
+                                                <ni:GeneralValueFormatter x:Name="valueFormatter2" Format="G" FontSize="20" FontStretch="UltraExpanded" FontStyle="Normal" FontWeight="Bold" ShortFormat="" Background="#FFF0EBEB" FrameworkElement.FlowDirection="RightToLeft" FontFamily="Century"/>
+                                            </ni:ValueFormatterGroup.DefaultFormatter>
+                                        </ni:ValueFormatterGroup>
+                                    </ni:MultiPlotCursor.ValuePresenter>
+                                </ni:MultiPlotCursor>
+                                <ni:MultiPlotCursor x:Name="CBWD_S2" Label="BWD" CrosshairBrush="#FF066BFD" Foreground="#FF084AFB" TargetBrush="#FF0A4BF9" Cursor="Hand" LabelVisibility="Visible" TargetShape="InwardTriangle" TargetSize="15,15"  >
+                                    <ni:MultiPlotCursor.AxisValue>
+                                        <System:Double>11</System:Double>
+                                    </ni:MultiPlotCursor.AxisValue>
+                                    <ni:MultiPlotCursor.ValuePresenter>
+                                        <ni:ValueFormatterGroup>
+                                            <ni:ValueFormatterGroup.DefaultFormatter>
+                                                <ni:GeneralValueFormatter x:Name="valueFormatter3" Format="G" FontSize="20" FontStretch="UltraExpanded" FontStyle="Normal" FontWeight="Bold" ShortFormat="" Background="#FFF0EBEB" FrameworkElement.FlowDirection="RightToLeft" FontFamily="Century"/>
+                                            </ni:ValueFormatterGroup.DefaultFormatter>
+                                        </ni:ValueFormatterGroup>
+                                    </ni:MultiPlotCursor.ValuePresenter>
+                                </ni:MultiPlotCursor>
+
+                            </ni:Graph.Children>
+                        </ni:Graph>
+                        <!-- 그래프 파렛트 -->
+                        <ni:GraphInteractionPalette  HorizontalAlignment="Right" Grid.Column="0" Grid.Row="1" Graph="{Binding ElementName=EcuMotorGraph}"/>
+                        <!-- RESULT -->
+                        <Border Grid.Column="0" Grid.ColumnSpan="1" Grid.Row="2"  Margin="2,2,2,2">
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="40"/>
+                                    <RowDefinition Height="30"/>
+                                    <RowDefinition Height="40"/>
+                                    <RowDefinition Height="40"/>
+
+                                </Grid.RowDefinitions>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="100"/>
+                                    <ColumnDefinition Width="125"/>
+                                    <ColumnDefinition Width="130"/>
+                                    <ColumnDefinition Width="100"/>
+                                    <ColumnDefinition Width="100"/>
+                                    <ColumnDefinition Width="100"/>
+                                    <ColumnDefinition Width="100"/>
+                                    <ColumnDefinition Width="100"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <Border Grid.Column="0" Grid.ColumnSpan="9" Grid.Row="0" Margin="1,1,1,1" >
+                                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                                        <iconPacks:PackIconMaterial  Kind="CarConnected" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                                        <Label Content="iMEB ASS'Y PISTON MOVING, PISTON STROKE 및 내부 리크 " VerticalContentAlignment="Center" HorizontalContentAlignment="Center" FontSize="24" FontStyle="Italic" FontWeight="ExtraBlack"/>
+                                    </StackPanel>
+                                </Border>
+
+                                <Border Grid.Column="0" Grid.Row="1" Margin="1,1,1,1" BorderThickness="1" BorderBrush="Gray">
+                                    <Label Content="구동전압(V)" VerticalContentAlignment="Center" HorizontalContentAlignment="Center"/>
+                                </Border>
+                                <Border Grid.Column="0" Grid.Row="2" Grid.RowSpan="2" Margin="1,1,1,1">
+                                    <Label x:Name="LT_Volt" Content="14.0" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" FontSize="22" Foreground="Blue" FontWeight="Bold" />
+                                </Border>
+
+                                <Border Grid.Column="1" Grid.Row="1" Margin="1,1,1,1" BorderThickness="1" BorderBrush="Gray">
+                                    <Label Content="구동행정" VerticalContentAlignment="Center" HorizontalContentAlignment="Center"/>
+                                </Border>
+
+                                <Border Grid.Column="1" Grid.Row="2"  Margin="1,1,1,1">
+                                    <StackPanel Orientation="Horizontal">
+                                        <iconPacks:PackIconMaterial Margin="5,0,0,0" Kind="Forward" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                                        <Label Content="전진"  VerticalContentAlignment="Center" HorizontalContentAlignment="Center" />
+                                        <Label x:Name="L_Start" Content="33.0" Width="35" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" />
+                                        <Label Content="mm" VerticalContentAlignment="Center" />
+                                    </StackPanel>
+                                </Border>
+                                <Border Grid.Column="1" Grid.Row="3"  Margin="1,1,1,1">
+                                    <StackPanel Orientation="Horizontal">
+                                        <iconPacks:PackIconMaterial Margin="5,0,0,0" Kind="Forward" Rotation="180" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                                        <Label Content="후진"  VerticalContentAlignment="Center" HorizontalContentAlignment="Center" />
+                                        <Label x:Name="L_End"  Content="1.0" Width="35"  VerticalContentAlignment="Center" HorizontalContentAlignment="Center" />
+                                        <Label Content="mm" VerticalContentAlignment="Center" />
+                                    </StackPanel>
+                                </Border>
+
+                                <Border Grid.Column="2" Grid.Row="1" Margin="1,1,1,1" BorderThickness="1" BorderBrush="Gray">
+                                    <Label Content="누설량 기준" VerticalContentAlignment="Center" HorizontalContentAlignment="Center"/>
+                                </Border>
+
+                                <Border Grid.Column="2" Grid.Row="2"  Margin="1,1,1,1">
+                                    <StackPanel Orientation="Horizontal">
+                                        <iconPacks:PackIconMaterial Kind="Upload" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                                        <Label x:Name="LTM_LeakMaxF" Content="180.0" Width="40" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" />
+                                        <Label Content="mmHg이상" VerticalContentAlignment="Center" />
+                                    </StackPanel>
+                                </Border>
+                                <Border Grid.Column="2" Grid.Row="3"  Margin="1,1,1,1">
+                                    <StackPanel Orientation="Horizontal">
+                                        <iconPacks:PackIconMaterial Kind="Upload" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                                        <Label x:Name="LTM_LeakMaxB" Content="300.0" Width="40" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" />
+                                        <Label Content="mmHg이상" VerticalContentAlignment="Center" />
+                                    </StackPanel>
+                                </Border>
+
+
+                                <Border Grid.Column="3" Grid.Row="1" Margin="1,1,1,1" BorderThickness="1" BorderBrush="Gray">
+                                    <Label Content="리크량(mmHg)" VerticalContentAlignment="Center" HorizontalContentAlignment="Center"/>
+                                </Border>
+                                <Border Grid.Column="3" Grid.Row="2"  Margin="1,1,1,1">
+                                    <Label x:Name="L_FWD_Leak" Content="0.00" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" FontSize="22" Foreground="Blue" FontWeight="Bold" />
+                                </Border>
+                                <Border Grid.Column="3" Grid.Row="3"  Margin="1,1,1,1">
+                                    <Label x:Name="L_BWD_Leak"  Content="0.00" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" FontSize="22" Foreground="Blue" FontWeight="Bold" />
+                                </Border>
+
+                                <Border Grid.Column="4" Grid.Row="1" Margin="1,1,1,1" BorderThickness="1" BorderBrush="Gray">
+                                    <Label Content="피크 전류(A)" VerticalContentAlignment="Center" HorizontalContentAlignment="Center"/>
+                                </Border>
+                                <Border Grid.Column="4" Grid.Row="2"  Margin="1,1,1,1">
+                                    <Label x:Name="L_FWD_Peak"  Content="0.00" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" FontSize="22" Foreground="Blue" FontWeight="Bold" />
+                                </Border>
+                                <Border Grid.Column="4" Grid.Row="3"  Margin="1,1,1,1">
+                                    <Label x:Name="L_BWD_Peak"  Content="0.00" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" FontSize="22" Foreground="Blue" FontWeight="Bold" />
+                                </Border>
+
+                                <Border Grid.Column="5" Grid.Row="1" Margin="1,1,1,1" BorderThickness="1" BorderBrush="Gray">
+                                    <Label Content="평균 전류(A)" VerticalContentAlignment="Center" HorizontalContentAlignment="Center"/>
+                                </Border>
+                                <Border Grid.Column="5" Grid.Row="2"  Margin="1,1,1,1">
+                                    <Label x:Name="L_FWD_Avg" Content="0.00" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" FontSize="22" Foreground="Blue" FontWeight="Bold" />
+                                </Border>
+                                <Border Grid.Column="5" Grid.Row="3"  Margin="1,1,1,1">
+                                    <Label x:Name="L_BWD_Avg" Content="0.00" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" FontSize="22" Foreground="Blue" FontWeight="Bold" />
+                                </Border>
+
+                                <Border Grid.Column="6" Grid.Row="1" Margin="1,1,1,1" BorderThickness="1" BorderBrush="Gray">
+                                    <Label Content="표준 편차(A)" VerticalContentAlignment="Center" HorizontalContentAlignment="Center"/>
+                                </Border>
+                                <Border Grid.Column="6" Grid.Row="2"  Margin="1,1,1,1">
+                                    <Label x:Name="L_FWD_Diva" Content="0.00" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" FontSize="22" Foreground="Blue" FontWeight="Bold" />
+                                </Border>
+                                <Border Grid.Column="6" Grid.Row="3"  Margin="1,1,1,1">
+                                    <Label x:Name="L_BWD_Diva" Content="0.00" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" FontSize="22" Foreground="Blue" FontWeight="Bold" />
+                                </Border>
+
+
+
+
+
+                                <Border Grid.Column="7" Grid.Row="1" Margin="1,1,1,1" BorderThickness="1" BorderBrush="Gray">
+                                    <Label Content="시험시간(초)" VerticalContentAlignment="Center" HorizontalContentAlignment="Center"/>
+                                </Border>
+                                <Border Grid.Column="7" Grid.Row="2" Grid.RowSpan="2" Margin="1,1,1,1">
+                                    <Label x:Name="LTM_TestTime" Content="0.0" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" FontSize="22" Foreground="Blue" FontWeight="Bold" />
+                                </Border>
+
+                                <Border Grid.Column="8" Grid.Row="1" Margin="1,1,1,1" BorderThickness="1" BorderBrush="Gray">
+                                    <Label Content="시험판정" VerticalContentAlignment="Center" HorizontalContentAlignment="Center"/>
+                                </Border>
+                                <Border Grid.Column="8" Grid.Row="2" Grid.RowSpan="2" Margin="1,1,1,1">
+                                    <Label x:Name="LTM_Result" Content="OK" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" FontSize="32" Foreground="Blue" FontWeight="Bold" />
+                                </Border>
+
+
+                            </Grid>
+                        </Border>
+                    </Grid>
+                </TabItem>
+                <!-- No.4 ECU NVH 테스트-->
+                <TabItem>
+                </TabItem>
+                <!-- No.5 로그창-->
+                <TabItem>
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="30"/>
+                        </Grid.RowDefinitions>
+                        <TabControl Grid.Row="0" Margin="2" x:Name="MainTabControl" ItemsSource="{Binding FileMonitors}" SelectedItem="{Binding SelectedItem}">
+                            <TabControl.ItemTemplate>
+                                <DataTemplate DataType="TLog:FileMonitorViewModel">
+                                    <TextBlock Text="{Binding FileName}" ToolTip="{Binding FilePath}" FontSize="12" />
+                                </DataTemplate>
+                            </TabControl.ItemTemplate>
+                            <TabControl.ContentTemplate>
+                                <DataTemplate DataType="TLog:FileMonitorViewModel">
+                                    <Grid>
+                                        <TextBox IsReadOnly="True" FontFamily="{Binding DataContext.Font, RelativeSource={RelativeSource AncestorType={x:Type Window}}}" TextWrapping="Wrap" VerticalScrollBarVisibility="Auto" AcceptsReturn="True" UndoLimit="0" IsUndoEnabled="False" Text="{Binding Contents}" TextChanged="TextBoxBase_OnTextChanged" />
+                                        <Grid HorizontalAlignment="Center" VerticalAlignment="Center" Visibility="{Binding FileExists, Converter={StaticResource VisibilityBoolConverter}}" >
+                                            <Border CornerRadius="3" Background="#BBBB0000">
+                                                <Border.Effect>
+                                                    <DropShadowEffect  RenderingBias="Quality" Opacity="0.6" BlurRadius="3" ShadowDepth="4" />
+                                                </Border.Effect>
+                                            </Border>
+                                            <Label Foreground="White" FontSize="20" Padding="30,10,30,15" Content="File Does Not Exist"/>
+                                        </Grid>
+                                    </Grid>
+                                </DataTemplate>
+                            </TabControl.ContentTemplate>
+                        </TabControl>
+                        <Grid Grid.Row="1">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition />
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+
+                            <Label Grid.Column="0" VerticalContentAlignment="Center" Content="Last Updated:" />
+                            <TextBlock Grid.Column="1" HorizontalAlignment="Left" VerticalAlignment="Center" Text="{Binding LastUpdated}"/>
+                            <Label Grid.Column="2" HorizontalAlignment="Right" VerticalContentAlignment="Center" Visibility="{Binding SelectedItem}" Content="Encoding:"/>
+                            <ComboBox Grid.Column="3" Margin="3" SelectedValue="{Binding SelectedItem.EncodingName}" Visibility="{Binding SelectedItem, Converter={StaticResource NullVisibilityConverter}}"
+								SelectedValuePath="Name" DisplayMemberPath="DisplayName" ItemsSource="{Binding Encodings}"/>
+                        </Grid>
+                    </Grid>
+                </TabItem>
+                <!-- No.6 시험 결과 창 그리드타입으로 -->
+                <TabItem>
+                    <Grid>
+                        <DataGrid x:Name="TestResultGrid" Margin="10,20,10,0" 
+							AutoGenerateColumns="False"
+                                  
+                                  >
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Header="시험명"   Binding="{Binding Name}"        IsReadOnly="True" Width="280"/>
+                                <DataGridTextColumn Header="하한값"   Binding="{Binding Low}"         IsReadOnly="True" Width="60"/>
+                                <DataGridTextColumn Header="측정값"   Binding="{Binding Measurement}" IsReadOnly="True" Width="80"/>
+                                <DataGridTextColumn Header="상한값"   Binding="{Binding High}"        IsReadOnly="True" Width="60"/>
+                                <DataGridTextColumn Header="측정단위" Binding="{Binding Unit}"        IsReadOnly="True" Width="80"/>
+                                <DataGridTextColumn Header="판독결과" Binding="{Binding Result}"      IsReadOnly="True" Width="70"/>
+                                <DataGridTextColumn Header="기타"     Binding="{Binding Message}"     IsReadOnly="True" Width="280"/>
+                            </DataGrid.Columns>
+                        </DataGrid>
+                    </Grid>
+                </TabItem>
+                <!-- No.7 원형 그래프 분석용-->
+                <TabItem>
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="200"/>
+                            <RowDefinition Height="110"/>
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="120"/>
+                        </Grid.ColumnDefinitions>
+                        <!-- 원 그래프-->
+                        <Grid Grid.Column="0" Grid.Row="0">
+                            <ni:PolarGraph x:Name="PolarGraph1" DataSource="{Binding MBCData}" RenderMode="Raster" IsHitTestVisible="True" Interactions="ZoomVertical, ZoomIn, ZoomOut, Zoom, ZoomHorizontal, Pan, PanHorizontal, PanVertical" MinHeight="5" >
+
+                                <ni:PolarGraph.RadiusAxis>
+                                    <ni:PolarRadiusAxis x:Name="Cir_Radius"  Radius="5" Adjuster="None">
+                                        <ni:PolarRadiusAxis.MajorGridLines>
+                                            <ni:GridLines Stroke="#400000B0"/>
+                                        </ni:PolarRadiusAxis.MajorGridLines>
+                                    </ni:PolarRadiusAxis>
+                                </ni:PolarGraph.RadiusAxis>
+                                <ni:PolarGraph.AngularAxis>
+                                    <ni:PolarAngularAxis ScaleKind="Degrees">
+                                        <ni:PolarAngularAxis.MajorGridLines>
+                                            <ni:GridLines Stroke="#400000B0"/>
+                                        </ni:PolarAngularAxis.MajorGridLines>
+                                    </ni:PolarAngularAxis>
+                                </ni:PolarGraph.AngularAxis>
+
+                            </ni:PolarGraph>
+                        </Grid>
+                        <!-- 인텐시브 -->
+                        <Border Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="1" >
+                            <ni:IntensityGraph x:Name="IntensityGraph1">
+                                <ni:IntensityGraph.ColorScale>
+                                    <ni:ColorScale Location="Far" LowColor="White" HighColor="Red" Adjuster="None" >
+                                        <ni:ColorScale.Markers>
+                                            <ni:ColorScaleMarker Color="#FFFBFBFB" Value="0" />
+                                            <ni:ColorScaleMarker Color="#FF0833C3" Value="5" />
+                                            <ni:ColorScaleMarker Color="#FFFF0707" Value="30.0" />
+                                        </ni:ColorScale.Markers>
+                                    </ni:ColorScale>
+                                </ni:IntensityGraph.ColorScale>
+                                <ni:IntensityGraph.HorizontalAxis>
+                                    <ni:AxisDouble Orientation="Horizontal" Adjuster="None" Range="0, 359, System.Double" />
+                                </ni:IntensityGraph.HorizontalAxis>
+                                <ni:IntensityGraph.VerticalAxis>
+                                    <ni:AxisDouble Orientation="Vertical" Adjuster="FitExactly" />
+                                </ni:IntensityGraph.VerticalAxis>
+                            </ni:IntensityGraph>
+                        </Border>
+                        <!-- 서브 메뉴 -->
+                        <Grid Grid.Column="1" Grid.Row="0">
+                            <StackPanel Margin="3,3,3,3">
+                                <Button x:Name="MBCFileLoad" Content="LOAD" Click="MBCFileLoad_Click" />
+                                <Label Content="1회전 거리(mm)"/>
+                                <ni:NumericTextBoxDouble x:Name="MasterLength" Value="4.00">
+                                    <ni:NumericTextBoxDouble.ValueFormatter>
+                                        <ni:GeneralValueFormatter Format="N3" ShortFormat="{x:Null}"/>
+                                    </ni:NumericTextBoxDouble.ValueFormatter>
+                                </ni:NumericTextBoxDouble>
+                                <Border Height="300">
+
+                                </Border>
+                                <Button x:Name="MBC_Scale_3" Content="Scale 3A"  Margin="10,2,10,2" Click="MBC_Scale_3_Click"/>
+                                <Button x:Name="MBC_Scale_5" Content="Scale 5A"  Margin="10,2,10,2" Click="MBC_Scale_5_Click"/>
+                                <Button x:Name="MBC_Scale_10" Content="Scale 10A"  Margin="10,2,10,2" Click="MBC_Scale_10_Click"/>
+                            </StackPanel>
+                        </Grid>
+                        <!-- 결과 표시 -->
+                        <Border Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="2"  Margin="2,2,2,2">
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="40"/>
+                                    <RowDefinition Height="30"/>
+                                    <RowDefinition Height="30"/>
+                                    <RowDefinition Height="10"/>
+
+                                </Grid.RowDefinitions>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="100"/>
+                                    <ColumnDefinition Width="125"/>
+                                    <ColumnDefinition Width="130"/>
+                                    <ColumnDefinition Width="100"/>
+                                    <ColumnDefinition Width="100"/>
+                                    <ColumnDefinition Width="100"/>
+                                    <ColumnDefinition Width="100"/>
+                                    <ColumnDefinition Width="100"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <Border Grid.Column="0" Grid.ColumnSpan="9" Grid.Row="0" Margin="1,1,1,1" >
+                                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                                        <iconPacks:PackIconMaterial  Kind="CalendarQuestion" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                                        <Label Content="Motor Leak Test Data Analysis " VerticalContentAlignment="Center" HorizontalContentAlignment="Center" FontSize="24" FontStyle="Italic" FontWeight="ExtraBlack"/>
+                                    </StackPanel>
+                                </Border>
+
+                                <Border Grid.Column="0" Grid.Row="1" Grid.ColumnSpan="2" Margin="1,1,1,1" BorderThickness="1" BorderBrush="Gray">
+                                    <Label Content="진행 정보" VerticalContentAlignment="Center" HorizontalContentAlignment="Center"/>
+                                </Border>
+                                <Border Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="2" Grid.RowSpan="2" Margin="1,1,1,1">
+                                    <Label x:Name="MBCReadDataCount"  Content="0" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" FontSize="14" Foreground="Blue" FontWeight="Bold" />
+                                </Border>
+                            </Grid>
+                        </Border>
+                    </Grid>
+                </TabItem>
+                <!-- No.8 이동평균 추세선 -->
+                <TabItem>
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="*"
+                                           MinHeight="250"/>
+                            <RowDefinition Height="0.5*"/>
+                            <RowDefinition Height="*"
+                                           MinHeight="250"/>
+                            <RowDefinition Height="0.5*"/>
+                            <RowDefinition Height="auto"/>
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="200"/>
+                        </Grid.ColumnDefinitions>
+
+                        <Grid Grid.Column="0" Grid.ColumnSpan="8" Grid.Row="0">
+                            <ni:Graph x:Name="Graph_FWDMain" RenderMode="Raster" >
+                                <ni:Graph.Plots>
+                                    <ni:Plot x:Name="P_A1" AdjustVerticalScale="False" AdjustHorizontalScale="True" VerticalScale="{Binding ElementName=YA1}"  HorizontalScale="{Binding ElementName=XPos1}">
+                                        <ni:LinePlotRenderer Stroke="Red" StrokeThickness="4" />
+                                    </ni:Plot>
+                                    <ni:Plot x:Name="P_MA1" AdjustVerticalScale="False" AdjustHorizontalScale="True" VerticalScale="{Binding ElementName=YA1}" HorizontalScale="{Binding ElementName=XPos1}">
+                                        <ni:LinePlotRenderer Stroke="Blue" StrokeThickness="4"/>
+                                    </ni:Plot>
+                                </ni:Graph.Plots>
+                                <ni:Graph.Axes>
+                                    <ni:AxisDouble x:Name="XPos1"  Range="0.0,100.0" Orientation="Horizontal" >
+                                        <ni:AxisDouble.LabelTemplate>
+                                            <DataTemplate>
+                                                <TextBlock Text="{Binding}" FontSize="14" Foreground="Blue"/>
+                                            </DataTemplate>
+                                        </ni:AxisDouble.LabelTemplate>
+                                        <ni:AxisDouble.MajorDivisions>
+                                            <ni:RangeLabeledDivisions LabelBrush="Blue" Mode="Count: 10">
+                                                <ni:RangeLabeledDivisions.LabelPresenter>
+                                                    <ni:GeneralValueFormatter Format="N1" ShortFormat="{x:Null}"/>
+                                                </ni:RangeLabeledDivisions.LabelPresenter>
+                                            </ni:RangeLabeledDivisions>
+                                        </ni:AxisDouble.MajorDivisions>
+                                    </ni:AxisDouble>
+                                    <ni:AxisDouble x:Name="YA1" Range="0.0,5.0"  Orientation="Vertical"   Label="A" LabelOrientation="Constant: 360">
+                                        <ni:AxisDouble.LabelTemplate>
+                                            <DataTemplate>
+                                                <TextBlock Text="{Binding}" FontSize="16" Foreground="Red"/>
+                                            </DataTemplate>
+                                        </ni:AxisDouble.LabelTemplate>
+                                        <ni:AxisDouble.MinorDivisions>
+                                            <ni:RangeDivisions/>
+                                        </ni:AxisDouble.MinorDivisions>
+                                        <ni:AxisDouble.MajorDivisions>
+                                            <ni:RangeLabeledDivisions LabelBrush="Red" Mode="Count: 5" >
+                                                <ni:RangeLabeledDivisions.LabelPresenter>
+                                                    <ni:GeneralValueFormatter Format="N1" ShortFormat="{x:Null}"/>
+                                                </ni:RangeLabeledDivisions.LabelPresenter>
+                                            </ni:RangeLabeledDivisions>
+                                        </ni:AxisDouble.MajorDivisions>
+                                    </ni:AxisDouble>
+                                </ni:Graph.Axes>
+                            </ni:Graph>
+                        </Grid>
+                        <Grid Grid.Column="8" Grid.Row="0">
+                            <ni:Graph x:Name="Graph_FWDMainTotal" RenderMode="Raster" >
+                                <ni:Graph.Plots >
+                                    <ni:Plot x:Name="P_FT1" AdjustVerticalScale="False" AdjustHorizontalScale="False"  VerticalScale="{Binding ElementName=YA11}"  HorizontalScale="{Binding ElementName=XPos11}">
+                                        <ni:LinePlotRenderer Stroke="Red" />
+                                    </ni:Plot>
+                                    <ni:Plot x:Name="P_FT2" AdjustVerticalScale="False" AdjustHorizontalScale="False"   VerticalScale="{Binding ElementName=YA11}" HorizontalScale="{Binding ElementName=XPos11}">
+                                        <ni:LinePlotRenderer Stroke="Orange"/>
+                                    </ni:Plot>
+                                    <ni:Plot x:Name="P_FT3" AdjustVerticalScale="False" AdjustHorizontalScale="False"   VerticalScale="{Binding ElementName=YA11}"  HorizontalScale="{Binding ElementName=XPos11}">
+                                        <ni:LinePlotRenderer Stroke="Yellow" />
+                                    </ni:Plot>
+                                    <ni:Plot x:Name="P_FT4"  AdjustVerticalScale="False" AdjustHorizontalScale="False"   VerticalScale="{Binding ElementName=YA11}" HorizontalScale="{Binding ElementName=XPos11}">
+                                        <ni:LinePlotRenderer Stroke="Green"/>
+                                    </ni:Plot>
+                                    <ni:Plot x:Name="P_FT5" AdjustVerticalScale="False" AdjustHorizontalScale="False"   VerticalScale="{Binding ElementName=YA11}"  HorizontalScale="{Binding ElementName=XPos11}">
+                                        <ni:LinePlotRenderer Stroke="Blue" />
+                                    </ni:Plot>
+                                    <ni:Plot x:Name="P_FT6"  AdjustVerticalScale="False" AdjustHorizontalScale="False"   VerticalScale="{Binding ElementName=YA11}" HorizontalScale="{Binding ElementName=XPos11}">
+                                        <ni:LinePlotRenderer Stroke="Indigo"/>
+                                    </ni:Plot>
+                                    <ni:Plot x:Name="P_FT7" AdjustVerticalScale="False" AdjustHorizontalScale="False"   VerticalScale="{Binding ElementName=YA11}"  HorizontalScale="{Binding ElementName=XPos11}">
+                                        <ni:LinePlotRenderer Stroke="Violet" />
+                                    </ni:Plot>
+                                    <ni:Plot x:Name="P_FT8"  AdjustVerticalScale="False" AdjustHorizontalScale="False"   VerticalScale="{Binding ElementName=YA11}" HorizontalScale="{Binding ElementName=XPos11}">
+                                        <ni:LinePlotRenderer Stroke="Bisque"/>
+                                    </ni:Plot>
+                                </ni:Graph.Plots>
+                                <ni:Graph.Axes>
+                                    <ni:AxisDouble x:Name="XPos11" Range="0.0,4.0" Orientation="Horizontal" >
+                                        <ni:AxisDouble.MajorDivisions>
+                                            <ni:RangeLabeledDivisions LabelBrush="Blue" Mode="Count: 5">
+                                            </ni:RangeLabeledDivisions>
+                                        </ni:AxisDouble.MajorDivisions>
+                                    </ni:AxisDouble>
+                                    <ni:AxisDouble x:Name="YA11" Range="0.0,5.0"  Orientation="Vertical"  >
+                                        <ni:AxisDouble.MinorDivisions>
+                                            <ni:RangeDivisions/>
+                                        </ni:AxisDouble.MinorDivisions>
+                                        <ni:AxisDouble.MajorDivisions>
+                                            <ni:RangeLabeledDivisions LabelBrush="Red" Mode="Count: 6" >
+                                                <ni:RangeLabeledDivisions.LabelPresenter>
+                                                    <ni:GeneralValueFormatter Format="N1" ShortFormat="{x:Null}"/>
+                                                </ni:RangeLabeledDivisions.LabelPresenter>
+                                            </ni:RangeLabeledDivisions>
+                                        </ni:AxisDouble.MajorDivisions>
+                                    </ni:AxisDouble>
+                                </ni:Graph.Axes>
+                            </ni:Graph>
+                        </Grid>
+
+                        <Grid Grid.Column="8" Grid.Row="1">
+                            <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto">
+                                <TextBlock x:Name="TB_FWD" Text="FWD" >
+
+                                </TextBlock>
+                            </ScrollViewer>
+                        </Grid>
+
+                        <Grid Grid.Column="0" Grid.Row="1">
+                            <ni:Graph x:Name="Graph_FWD_Sub1">
+                                <ni:Graph.PlotAreaBackground>
+                                    <SolidColorBrush Color="#FFB5D5F7"/>
+                                </ni:Graph.PlotAreaBackground>
+                                <ni:Graph.Plots>
+                                    <ni:Plot x:Name="FWD_P1" AdjustVerticalScale="False" AdjustHorizontalScale="False"  VerticalScale="{Binding ElementName=FWD_A1}"  HorizontalScale="{Binding ElementName=FWD_mm1}">
+                                        <ni:LinePlotRenderer Stroke="Blue" StrokeThickness="4" />
+                                    </ni:Plot>
+                                </ni:Graph.Plots>
+                                <ni:Graph.Axes>
+                                    <ni:AxisDouble x:Name="FWD_mm1" Range="0.0,4.0" Orientation="Horizontal" >
+                                        <ni:AxisDouble.MajorDivisions>
+                                            <ni:RangeLabeledDivisions LabelBrush="Blue" Mode="Count: 1">
+                                                <ni:RangeLabeledDivisions.LabelPresenter>
+                                                    <ni:GeneralValueFormatter Format="D" ShortFormat="{x:Null}"/>
+                                                </ni:RangeLabeledDivisions.LabelPresenter>
+                                            </ni:RangeLabeledDivisions>
+                                        </ni:AxisDouble.MajorDivisions>
+                                    </ni:AxisDouble>
+                                    <ni:AxisDouble x:Name="FWD_A1" Range="0.0,5.0"  Orientation="Vertical" >
+                                        <ni:AxisDouble.MinorDivisions>
+                                            <ni:RangeDivisions/>
+                                        </ni:AxisDouble.MinorDivisions>
+                                        <ni:AxisDouble.MajorDivisions>
+                                            <ni:RangeLabeledDivisions LabelBrush="Red" Mode="Count: 3" >
+                                                <ni:RangeLabeledDivisions.LabelPresenter>
+                                                    <ni:GeneralValueFormatter Format="D" ShortFormat="{x:Null}"/>
+                                                </ni:RangeLabeledDivisions.LabelPresenter>
+                                            </ni:RangeLabeledDivisions>
+                                        </ni:AxisDouble.MajorDivisions>
+                                    </ni:AxisDouble>
+                                </ni:Graph.Axes>
+                            </ni:Graph>
+                        </Grid>
+                        <Grid Grid.Column="1" Grid.Row="1">
+                            <ni:Graph x:Name="Graph_FWD_Sub2">
+                                <ni:Graph.Plots>
+                                    <ni:Plot x:Name="FWD_P2" AdjustVerticalScale="False" AdjustHorizontalScale="False"  VerticalScale="{Binding ElementName=FWD_A2}"  HorizontalScale="{Binding ElementName=FWD_mm2}">
+                                        <ni:LinePlotRenderer Stroke="Blue" StrokeThickness="4" />
+                                    </ni:Plot>
+                                </ni:Graph.Plots>
+                                <ni:Graph.Axes>
+                                    <ni:AxisDouble x:Name="FWD_mm2" Range="0.0,4.0" Orientation="Horizontal" >
+                                        <ni:AxisDouble.MajorDivisions>
+                                            <ni:RangeLabeledDivisions LabelBrush="Blue" Mode="Count: 1">
+                                                <ni:RangeLabeledDivisions.LabelPresenter>
+                                                    <ni:GeneralValueFormatter Format="D" ShortFormat="{x:Null}"/>
+                                                </ni:RangeLabeledDivisions.LabelPresenter>
+                                            </ni:RangeLabeledDivisions>
+                                        </ni:AxisDouble.MajorDivisions>
+                                    </ni:AxisDouble>
+                                    <ni:AxisDouble x:Name="FWD_A2" Range="0.0,5.0"  Orientation="Vertical" >
+                                        <ni:AxisDouble.MinorDivisions>
+                                            <ni:RangeDivisions/>
+                                        </ni:AxisDouble.MinorDivisions>
+                                        <ni:AxisDouble.MajorDivisions>
+                                            <ni:RangeLabeledDivisions LabelBrush="Red" Mode="Count: 3" >
+                                                <ni:RangeLabeledDivisions.LabelPresenter>
+                                                    <ni:GeneralValueFormatter Format="D" ShortFormat="{x:Null}"/>
+                                                </ni:RangeLabeledDivisions.LabelPresenter>
+                                            </ni:RangeLabeledDivisions>
+                                        </ni:AxisDouble.MajorDivisions>
+                                    </ni:AxisDouble>
+                                </ni:Graph.Axes>
+                            </ni:Graph>
+                        </Grid>
+                        <Grid Grid.Column="2" Grid.Row="1">
+                            <ni:Graph x:Name="Graph_FWD_Sub3">
+                                <ni:Graph.Plots>
+                                    <ni:Plot x:Name="FWD_P3" AdjustVerticalScale="False" AdjustHorizontalScale="False"  VerticalScale="{Binding ElementName=FWD_A3}"  HorizontalScale="{Binding ElementName=FWD_mm3}">
+                                        <ni:LinePlotRenderer Stroke="Blue" StrokeThickness="4" />
+                                    </ni:Plot>
+                                </ni:Graph.Plots>
+                                <ni:Graph.Axes>
+                                    <ni:AxisDouble x:Name="FWD_mm3" Range="0.0,4.0" Orientation="Horizontal" >
+                                        <ni:AxisDouble.MajorDivisions>
+                                            <ni:RangeLabeledDivisions LabelBrush="Blue" Mode="Count: 1">
+                                                <ni:RangeLabeledDivisions.LabelPresenter>
+                                                    <ni:GeneralValueFormatter Format="D" ShortFormat="{x:Null}"/>
+                                                </ni:RangeLabeledDivisions.LabelPresenter>
+                                            </ni:RangeLabeledDivisions>
+                                        </ni:AxisDouble.MajorDivisions>
+                                    </ni:AxisDouble>
+                                    <ni:AxisDouble x:Name="FWD_A3" Range="0.0,5.0"  Orientation="Vertical" >
+                                        <ni:AxisDouble.MinorDivisions>
+                                            <ni:RangeDivisions/>
+                                        </ni:AxisDouble.MinorDivisions>
+                                        <ni:AxisDouble.MajorDivisions>
+                                            <ni:RangeLabeledDivisions LabelBrush="Red" Mode="Count: 3" >
+                                                <ni:RangeLabeledDivisions.LabelPresenter>
+                                                    <ni:GeneralValueFormatter Format="D" ShortFormat="{x:Null}"/>
+                                                </ni:RangeLabeledDivisions.LabelPresenter>
+                                            </ni:RangeLabeledDivisions>
+                                        </ni:AxisDouble.MajorDivisions>
+                                    </ni:AxisDouble>
+                                </ni:Graph.Axes>
+                            </ni:Graph>
+                        </Grid>
+                        <Grid Grid.Column="3" Grid.Row="1">
+                            <ni:Graph x:Name="Graph_FWD_Sub4">
+                                <ni:Graph.Plots>
+                                    <ni:Plot x:Name="FWD_P4" AdjustVerticalScale="False" AdjustHorizontalScale="False"  VerticalScale="{Binding ElementName=FWD_A4}"  HorizontalScale="{Binding ElementName=FWD_mm4}">
+                                        <ni:LinePlotRenderer Stroke="Blue" StrokeThickness="4" />
+                                    </ni:Plot>
+                                </ni:Graph.Plots>
+                                <ni:Graph.Axes>
+                                    <ni:AxisDouble x:Name="FWD_mm4" Range="0.0,4.0" Orientation="Horizontal" >
+                                        <ni:AxisDouble.MajorDivisions>
+                                            <ni:RangeLabeledDivisions LabelBrush="Blue" Mode="Count: 1">
+                                                <ni:RangeLabeledDivisions.LabelPresenter>
+                                                    <ni:GeneralValueFormatter Format="D" ShortFormat="{x:Null}"/>
+                                                </ni:RangeLabeledDivisions.LabelPresenter>
+                                            </ni:RangeLabeledDivisions>
+                                        </ni:AxisDouble.MajorDivisions>
+                                    </ni:AxisDouble>
+                                    <ni:AxisDouble x:Name="FWD_A4" Range="0.0,5.0"  Orientation="Vertical" >
+                                        <ni:AxisDouble.MinorDivisions>
+                                            <ni:RangeDivisions/>
+                                        </ni:AxisDouble.MinorDivisions>
+                                        <ni:AxisDouble.MajorDivisions>
+                                            <ni:RangeLabeledDivisions LabelBrush="Red" Mode="Count: 3" >
+                                                <ni:RangeLabeledDivisions.LabelPresenter>
+                                                    <ni:GeneralValueFormatter Format="D" ShortFormat="{x:Null}"/>
+                                                </ni:RangeLabeledDivisions.LabelPresenter>
+                                            </ni:RangeLabeledDivisions>
+                                        </ni:AxisDouble.MajorDivisions>
+                                    </ni:AxisDouble>
+                                </ni:Graph.Axes>
+                            </ni:Graph>
+                        </Grid>
+                        <Grid Grid.Column="4" Grid.Row="1">
+                            <ni:Graph x:Name="Graph_FWD_Sub5">
+                                <ni:Graph.Plots>
+                                    <ni:Plot x:Name="FWD_P5" AdjustVerticalScale="False" AdjustHorizontalScale="False"  VerticalScale="{Binding ElementName=FWD_A5}"  HorizontalScale="{Binding ElementName=FWD_mm5}">
+                                        <ni:LinePlotRenderer Stroke="Blue" StrokeThickness="4" />
+                                    </ni:Plot>
+                                </ni:Graph.Plots>
+                                <ni:Graph.Axes>
+                                    <ni:AxisDouble x:Name="FWD_mm5" Range="0.0,4.0" Orientation="Horizontal" >
+                                        <ni:AxisDouble.MajorDivisions>
+                                            <ni:RangeLabeledDivisions LabelBrush="Blue" Mode="Count: 1">
+                                                <ni:RangeLabeledDivisions.LabelPresenter>
+                                                    <ni:GeneralValueFormatter Format="D" ShortFormat="{x:Null}"/>
+                                                </ni:RangeLabeledDivisions.LabelPresenter>
+                                            </ni:RangeLabeledDivisions>
+                                        </ni:AxisDouble.MajorDivisions>
+                                    </ni:AxisDouble>
+                                    <ni:AxisDouble x:Name="FWD_A5" Range="0.0,5.0"  Orientation="Vertical" >
+                                        <ni:AxisDouble.MinorDivisions>
+                                            <ni:RangeDivisions/>
+                                        </ni:AxisDouble.MinorDivisions>
+                                        <ni:AxisDouble.MajorDivisions>
+                                            <ni:RangeLabeledDivisions LabelBrush="Red" Mode="Count: 3" >
+                                                <ni:RangeLabeledDivisions.LabelPresenter>
+                                                    <ni:GeneralValueFormatter Format="D" ShortFormat="{x:Null}"/>
+                                                </ni:RangeLabeledDivisions.LabelPresenter>
+                                            </ni:RangeLabeledDivisions>
+                                        </ni:AxisDouble.MajorDivisions>
+                                    </ni:AxisDouble>
+                                </ni:Graph.Axes>
+                            </ni:Graph>
+                        </Grid>
+                        <Grid Grid.Column="5" Grid.Row="1">
+                            <ni:Graph x:Name="Graph_FWD_Sub6">
+                                <ni:Graph.Plots>
+                                    <ni:Plot x:Name="FWD_P6" AdjustVerticalScale="False" AdjustHorizontalScale="False"   VerticalScale="{Binding ElementName=FWD_A6}"  HorizontalScale="{Binding ElementName=FWD_mm6}">
+                                        <ni:LinePlotRenderer Stroke="Blue" StrokeThickness="4" />
+                                    </ni:Plot>
+                                </ni:Graph.Plots>
+                                <ni:Graph.Axes>
+                                    <ni:AxisDouble x:Name="FWD_mm6" Range="0.0,4.0" Orientation="Horizontal" >
+                                        <ni:AxisDouble.MajorDivisions>
+                                            <ni:RangeLabeledDivisions LabelBrush="Blue" Mode="Count: 1">
+                                                <ni:RangeLabeledDivisions.LabelPresenter>
+                                                    <ni:GeneralValueFormatter Format="D" ShortFormat="{x:Null}"/>
+                                                </ni:RangeLabeledDivisions.LabelPresenter>
+                                            </ni:RangeLabeledDivisions>
+                                        </ni:AxisDouble.MajorDivisions>
+                                    </ni:AxisDouble>
+                                    <ni:AxisDouble x:Name="FWD_A6" Range="0.0,5.0"  Orientation="Vertical" >
+                                        <ni:AxisDouble.MinorDivisions>
+                                            <ni:RangeDivisions/>
+                                        </ni:AxisDouble.MinorDivisions>
+                                        <ni:AxisDouble.MajorDivisions>
+                                            <ni:RangeLabeledDivisions LabelBrush="Red" Mode="Count: 3" >
+                                                <ni:RangeLabeledDivisions.LabelPresenter>
+                                                    <ni:GeneralValueFormatter Format="D" ShortFormat="{x:Null}"/>
+                                                </ni:RangeLabeledDivisions.LabelPresenter>
+                                            </ni:RangeLabeledDivisions>
+                                        </ni:AxisDouble.MajorDivisions>
+                                    </ni:AxisDouble>
+                                </ni:Graph.Axes>
+                            </ni:Graph>
+                        </Grid>
+                        <Grid Grid.Column="6" Grid.Row="1">
+                            <ni:Graph x:Name="Graph_FWD_Sub7">
+                                <ni:Graph.Plots>
+                                    <ni:Plot x:Name="FWD_P7" AdjustVerticalScale="False" AdjustHorizontalScale="False"  VerticalScale="{Binding ElementName=FWD_A7}"  HorizontalScale="{Binding ElementName=FWD_mm7}">
+                                        <ni:LinePlotRenderer Stroke="Blue" StrokeThickness="4" />
+                                    </ni:Plot>
+                                </ni:Graph.Plots>
+                                <ni:Graph.Axes>
+                                    <ni:AxisDouble x:Name="FWD_mm7" Range="0.0,4.0" Orientation="Horizontal" >
+                                        <ni:AxisDouble.MajorDivisions>
+                                            <ni:RangeLabeledDivisions LabelBrush="Blue" Mode="Count: 1">
+                                                <ni:RangeLabeledDivisions.LabelPresenter>
+                                                    <ni:GeneralValueFormatter Format="D" ShortFormat="{x:Null}"/>
+                                                </ni:RangeLabeledDivisions.LabelPresenter>
+                                            </ni:RangeLabeledDivisions>
+                                        </ni:AxisDouble.MajorDivisions>
+                                    </ni:AxisDouble>
+                                    <ni:AxisDouble x:Name="FWD_A7" Range="0.0,5.0"  Orientation="Vertical" >
+                                        <ni:AxisDouble.MinorDivisions>
+                                            <ni:RangeDivisions/>
+                                        </ni:AxisDouble.MinorDivisions>
+                                        <ni:AxisDouble.MajorDivisions>
+                                            <ni:RangeLabeledDivisions LabelBrush="Red" Mode="Count: 3" >
+                                                <ni:RangeLabeledDivisions.LabelPresenter>
+                                                    <ni:GeneralValueFormatter Format="D" ShortFormat="{x:Null}"/>
+                                                </ni:RangeLabeledDivisions.LabelPresenter>
+                                            </ni:RangeLabeledDivisions>
+                                        </ni:AxisDouble.MajorDivisions>
+                                    </ni:AxisDouble>
+                                </ni:Graph.Axes>
+                            </ni:Graph>
+                        </Grid>
+                        <Grid Grid.Column="7" Grid.Row="1">
+                            <ni:Graph x:Name="Graph_FWD_Sub8">
+                                <ni:Graph.Plots>
+                                    <ni:Plot x:Name="FWD_P8" AdjustVerticalScale="False" AdjustHorizontalScale="False"   VerticalScale="{Binding ElementName=FWD_A8}"  HorizontalScale="{Binding ElementName=FWD_mm8}">
+                                        <ni:LinePlotRenderer Stroke="Blue" StrokeThickness="4" />
+                                    </ni:Plot>
+                                </ni:Graph.Plots>
+                                <ni:Graph.Axes>
+                                    <ni:AxisDouble x:Name="FWD_mm8" Range="0.0,4.0" Orientation="Horizontal" >
+                                        <ni:AxisDouble.MajorDivisions>
+                                            <ni:RangeLabeledDivisions LabelBrush="Blue" Mode="Count: 1">
+                                                <ni:RangeLabeledDivisions.LabelPresenter>
+                                                    <ni:GeneralValueFormatter Format="D" ShortFormat="{x:Null}"/>
+                                                </ni:RangeLabeledDivisions.LabelPresenter>
+                                            </ni:RangeLabeledDivisions>
+                                        </ni:AxisDouble.MajorDivisions>
+                                    </ni:AxisDouble>
+                                    <ni:AxisDouble x:Name="FWD_A8" Range="0.0,5.0"  Orientation="Vertical" >
+                                        <ni:AxisDouble.MinorDivisions>
+                                            <ni:RangeDivisions/>
+                                        </ni:AxisDouble.MinorDivisions>
+                                        <ni:AxisDouble.MajorDivisions>
+                                            <ni:RangeLabeledDivisions LabelBrush="Red" Mode="Count: 3" >
+                                                <ni:RangeLabeledDivisions.LabelPresenter>
+                                                    <ni:GeneralValueFormatter Format="D" ShortFormat="{x:Null}"/>
+                                                </ni:RangeLabeledDivisions.LabelPresenter>
+                                            </ni:RangeLabeledDivisions>
+                                        </ni:AxisDouble.MajorDivisions>
+                                    </ni:AxisDouble>
+                                </ni:Graph.Axes>
+                            </ni:Graph>
+                        </Grid>
+
+
+
+                        <Grid Grid.Column="0" Grid.ColumnSpan="8" Grid.Row="2">
+                            <ni:Graph x:Name="Graph_BWDMain" RenderMode="Raster" >
+                                <ni:Graph.Plots>
+                                    <ni:Plot x:Name="P_A2" AdjustVerticalScale="False" AdjustHorizontalScale="True" VerticalScale="{Binding ElementName=YA2}"  HorizontalScale="{Binding ElementName=XPos2}">
+                                        <ni:LinePlotRenderer Stroke="Red" StrokeThickness="4" />
+                                    </ni:Plot>
+                                    <ni:Plot x:Name="P_MA2" AdjustVerticalScale="False" AdjustHorizontalScale="True"  VerticalScale="{Binding ElementName=YA2}" HorizontalScale="{Binding ElementName=XPos2}">
+                                        <ni:LinePlotRenderer Stroke="Blue" StrokeThickness="4"/>
+                                    </ni:Plot>
+                                </ni:Graph.Plots>
+                                <ni:Graph.Axes>
+                                    <ni:AxisDouble x:Name="XPos2" Range="0.0,100.0" Orientation="Horizontal" >
+                                        <ni:AxisDouble.LabelTemplate>
+                                            <DataTemplate>
+                                                <TextBlock Text="{Binding}" FontSize="14" Foreground="Blue"/>
+                                            </DataTemplate>
+                                        </ni:AxisDouble.LabelTemplate>
+                                        <ni:AxisDouble.MajorDivisions>
+                                            <ni:RangeLabeledDivisions LabelBrush="Blue" Mode="Count: 10">
+                                                <ni:RangeLabeledDivisions.LabelPresenter>
+                                                    <ni:GeneralValueFormatter Format="N1" ShortFormat="{x:Null}"/>
+                                                </ni:RangeLabeledDivisions.LabelPresenter>
+                                            </ni:RangeLabeledDivisions>
+                                        </ni:AxisDouble.MajorDivisions>
+                                    </ni:AxisDouble>
+                                    <ni:AxisDouble x:Name="YA2" Range="-5.0,0.0"  Orientation="Vertical"   Label="A" LabelOrientation="Constant: 360">
+                                        <ni:AxisDouble.LabelTemplate>
+                                            <DataTemplate>
+                                                <TextBlock Text="{Binding}" FontSize="16" Foreground="Red"/>
+                                            </DataTemplate>
+                                        </ni:AxisDouble.LabelTemplate>
+                                        <ni:AxisDouble.MinorDivisions>
+                                            <ni:RangeDivisions/>
+                                        </ni:AxisDouble.MinorDivisions>
+                                        <ni:AxisDouble.MajorDivisions>
+                                            <ni:RangeLabeledDivisions LabelBrush="Red" Mode="Count: 5" >
+                                                <ni:RangeLabeledDivisions.LabelPresenter>
+                                                    <ni:GeneralValueFormatter Format="N1" ShortFormat="{x:Null}"/>
+                                                </ni:RangeLabeledDivisions.LabelPresenter>
+                                            </ni:RangeLabeledDivisions>
+                                        </ni:AxisDouble.MajorDivisions>
+                                    </ni:AxisDouble>
+                                </ni:Graph.Axes>
+                            </ni:Graph>
+                        </Grid>
+
+                        <Grid Grid.Column="8" Grid.Row="2">
+                            <ni:Graph x:Name="Graph_BWDMainTotal" RenderMode="Raster" >
+                                <ni:Graph.Plots >
+                                    <ni:Plot x:Name="P_BT1" AdjustVerticalScale="False" AdjustHorizontalScale="False" VerticalScale="{Binding ElementName=YA22}"  HorizontalScale="{Binding ElementName=XPos22}">
+                                        <ni:LinePlotRenderer Stroke="Red" />
+                                    </ni:Plot>
+                                    <ni:Plot x:Name="P_BT2" AdjustVerticalScale="False" AdjustHorizontalScale="False"  VerticalScale="{Binding ElementName=YA22}" HorizontalScale="{Binding ElementName=XPos22}">
+                                        <ni:LinePlotRenderer Stroke="Orange"/>
+                                    </ni:Plot>
+                                    <ni:Plot x:Name="P_BT3" AdjustVerticalScale="False" AdjustHorizontalScale="False"  VerticalScale="{Binding ElementName=YA22}"  HorizontalScale="{Binding ElementName=XPos22}">
+                                        <ni:LinePlotRenderer Stroke="Yellow" />
+                                    </ni:Plot>
+                                    <ni:Plot x:Name="P_BT4"  AdjustVerticalScale="False" AdjustHorizontalScale="False"  VerticalScale="{Binding ElementName=YA22}" HorizontalScale="{Binding ElementName=XPos22}">
+                                        <ni:LinePlotRenderer Stroke="Green"/>
+                                    </ni:Plot>
+                                    <ni:Plot x:Name="P_BT5" AdjustVerticalScale="False" AdjustHorizontalScale="False"  VerticalScale="{Binding ElementName=YA22}"  HorizontalScale="{Binding ElementName=XPos22}">
+                                        <ni:LinePlotRenderer Stroke="Blue" />
+                                    </ni:Plot>
+                                    <ni:Plot x:Name="P_BT6" AdjustVerticalScale="False" AdjustHorizontalScale="False"   VerticalScale="{Binding ElementName=YA22}" HorizontalScale="{Binding ElementName=XPos22}">
+                                        <ni:LinePlotRenderer Stroke="Indigo"/>
+                                    </ni:Plot>
+                                    <ni:Plot x:Name="P_BT7"  AdjustVerticalScale="False" AdjustHorizontalScale="False" VerticalScale="{Binding ElementName=YA22}"  HorizontalScale="{Binding ElementName=XPos22}">
+                                        <ni:LinePlotRenderer Stroke="Violet" />
+                                    </ni:Plot>
+                                    <ni:Plot x:Name="P_BT8" AdjustVerticalScale="False" AdjustHorizontalScale="False"   VerticalScale="{Binding ElementName=YA22}" HorizontalScale="{Binding ElementName=XPos22}">
+                                        <ni:LinePlotRenderer Stroke="Bisque"/>
+                                    </ni:Plot>
+                                </ni:Graph.Plots>
+                                <ni:Graph.Axes>
+                                    <ni:AxisDouble x:Name="XPos22" Range="0.0,4.0" Orientation="Horizontal" >
+                                        <ni:AxisDouble.MajorDivisions>
+                                            <ni:RangeLabeledDivisions LabelBrush="Blue" Mode="Count: 5">
+                                            </ni:RangeLabeledDivisions>
+                                        </ni:AxisDouble.MajorDivisions>
+                                    </ni:AxisDouble>
+                                    <ni:AxisDouble x:Name="YA22" Range="-5.0,0.0"  Orientation="Vertical"  >
+                                        <ni:AxisDouble.MinorDivisions>
+                                            <ni:RangeDivisions/>
+                                        </ni:AxisDouble.MinorDivisions>
+                                        <ni:AxisDouble.MajorDivisions>
+                                            <ni:RangeLabeledDivisions LabelBrush="Red" Mode="Count: 5" >
+                                                <ni:RangeLabeledDivisions.LabelPresenter>
+                                                    <ni:GeneralValueFormatter Format="N1" ShortFormat="{x:Null}"/>
+                                                </ni:RangeLabeledDivisions.LabelPresenter>
+                                            </ni:RangeLabeledDivisions>
+                                        </ni:AxisDouble.MajorDivisions>
+                                    </ni:AxisDouble>
+                                </ni:Graph.Axes>
+                            </ni:Graph>
+                        </Grid>
+
+                        <Grid Grid.Column="8" Grid.Row="3">
+                            <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto">
+                                <TextBlock x:Name="TB_BWD" Text="BWD" >
+
+                                </TextBlock>
+                            </ScrollViewer>
+                        </Grid>
+
+                        <Grid Grid.Column="0" Grid.Row="3">
+                            <ni:Graph x:Name="Graph_BWD_Sub1">
+                                <ni:Graph.Plots>
+                                    <ni:Plot x:Name="BWD_P1" AdjustVerticalScale="False" AdjustHorizontalScale="False"   VerticalScale="{Binding ElementName=BWD_A1}"  HorizontalScale="{Binding ElementName=BWD_mm1}">
+                                        <ni:LinePlotRenderer Stroke="Blue" StrokeThickness="4" />
+                                    </ni:Plot>
+                                </ni:Graph.Plots>
+                                <ni:Graph.Axes>
+                                    <ni:AxisDouble x:Name="BWD_mm1" Range="0.0,4.0" Orientation="Horizontal" >
+                                        <ni:AxisDouble.MajorDivisions>
+                                            <ni:RangeLabeledDivisions LabelBrush="Blue" Mode="Count: 1">
+                                                <ni:RangeLabeledDivisions.LabelPresenter>
+                                                    <ni:GeneralValueFormatter Format="D" ShortFormat="{x:Null}"/>
+                                                </ni:RangeLabeledDivisions.LabelPresenter>
+                                            </ni:RangeLabeledDivisions>
+                                        </ni:AxisDouble.MajorDivisions>
+                                    </ni:AxisDouble>
+                                    <ni:AxisDouble x:Name="BWD_A1" Range="-5.0,0.0"  Orientation="Vertical" >
+                                        <ni:AxisDouble.MinorDivisions>
+                                            <ni:RangeDivisions/>
+                                        </ni:AxisDouble.MinorDivisions>
+                                        <ni:AxisDouble.MajorDivisions>
+                                            <ni:RangeLabeledDivisions LabelBrush="Red" Mode="Count: 3" >
+                                                <ni:RangeLabeledDivisions.LabelPresenter>
+                                                    <ni:GeneralValueFormatter Format="D" ShortFormat="{x:Null}"/>
+                                                </ni:RangeLabeledDivisions.LabelPresenter>
+                                            </ni:RangeLabeledDivisions>
+                                        </ni:AxisDouble.MajorDivisions>
+                                    </ni:AxisDouble>
+                                </ni:Graph.Axes>
+                            </ni:Graph>
+                        </Grid>
+                        <Grid Grid.Column="1" Grid.Row="3">
+                            <ni:Graph x:Name="Graph_BWD_Sub2">
+                                <ni:Graph.Plots>
+                                    <ni:Plot x:Name="BWD_P2" AdjustVerticalScale="False" AdjustHorizontalScale="False"   VerticalScale="{Binding ElementName=BWD_A2}"  HorizontalScale="{Binding ElementName=BWD_mm2}">
+                                        <ni:LinePlotRenderer Stroke="Blue" StrokeThickness="4" />
+                                    </ni:Plot>
+                                </ni:Graph.Plots>
+                                <ni:Graph.Axes>
+                                    <ni:AxisDouble x:Name="BWD_mm2" Range="0.0,4.0" Orientation="Horizontal" >
+                                        <ni:AxisDouble.MajorDivisions>
+                                            <ni:RangeLabeledDivisions LabelBrush="Blue" Mode="Count: 1">
+                                                <ni:RangeLabeledDivisions.LabelPresenter>
+                                                    <ni:GeneralValueFormatter Format="D" ShortFormat="{x:Null}"/>
+                                                </ni:RangeLabeledDivisions.LabelPresenter>
+                                            </ni:RangeLabeledDivisions>
+                                        </ni:AxisDouble.MajorDivisions>
+                                    </ni:AxisDouble>
+                                    <ni:AxisDouble x:Name="BWD_A2" Range="-5.0,0.0"  Orientation="Vertical" >
+                                        <ni:AxisDouble.MinorDivisions>
+                                            <ni:RangeDivisions/>
+                                        </ni:AxisDouble.MinorDivisions>
+                                        <ni:AxisDouble.MajorDivisions>
+                                            <ni:RangeLabeledDivisions LabelBrush="Red" Mode="Count: 3" >
+                                                <ni:RangeLabeledDivisions.LabelPresenter>
+                                                    <ni:GeneralValueFormatter Format="D" ShortFormat="{x:Null}"/>
+                                                </ni:RangeLabeledDivisions.LabelPresenter>
+                                            </ni:RangeLabeledDivisions>
+                                        </ni:AxisDouble.MajorDivisions>
+                                    </ni:AxisDouble>
+                                </ni:Graph.Axes>
+                            </ni:Graph>
+                        </Grid>
+                        <Grid Grid.Column="2" Grid.Row="3">
+                            <ni:Graph x:Name="Graph_BWD_Sub3">
+                                <ni:Graph.Plots>
+                                    <ni:Plot x:Name="BWD_P3" AdjustVerticalScale="False" AdjustHorizontalScale="False"  VerticalScale="{Binding ElementName=BWD_A3}"  HorizontalScale="{Binding ElementName=BWD_mm3}">
+                                        <ni:LinePlotRenderer Stroke="Blue" StrokeThickness="4" />
+                                    </ni:Plot>
+                                </ni:Graph.Plots>
+                                <ni:Graph.Axes>
+                                    <ni:AxisDouble x:Name="BWD_mm3" Range="0.0,4.0" Orientation="Horizontal" >
+                                        <ni:AxisDouble.MajorDivisions>
+                                            <ni:RangeLabeledDivisions LabelBrush="Blue" Mode="Count: 1">
+                                                <ni:RangeLabeledDivisions.LabelPresenter>
+                                                    <ni:GeneralValueFormatter Format="D" ShortFormat="{x:Null}"/>
+                                                </ni:RangeLabeledDivisions.LabelPresenter>
+                                            </ni:RangeLabeledDivisions>
+                                        </ni:AxisDouble.MajorDivisions>
+                                    </ni:AxisDouble>
+                                    <ni:AxisDouble x:Name="BWD_A3" Range="-5.0,0.0"  Orientation="Vertical" >
+                                        <ni:AxisDouble.MinorDivisions>
+                                            <ni:RangeDivisions/>
+                                        </ni:AxisDouble.MinorDivisions>
+                                        <ni:AxisDouble.MajorDivisions>
+                                            <ni:RangeLabeledDivisions LabelBrush="Red" Mode="Count: 3" >
+                                                <ni:RangeLabeledDivisions.LabelPresenter>
+                                                    <ni:GeneralValueFormatter Format="D" ShortFormat="{x:Null}"/>
+                                                </ni:RangeLabeledDivisions.LabelPresenter>
+                                            </ni:RangeLabeledDivisions>
+                                        </ni:AxisDouble.MajorDivisions>
+                                    </ni:AxisDouble>
+                                </ni:Graph.Axes>
+                            </ni:Graph>
+                        </Grid>
+                        <Grid Grid.Column="3" Grid.Row="3">
+                            <ni:Graph x:Name="Graph_BWD_Sub4">
+                                <ni:Graph.Plots>
+                                    <ni:Plot x:Name="BWD_P4" AdjustVerticalScale="False" AdjustHorizontalScale="False"  VerticalScale="{Binding ElementName=BWD_A4}"  HorizontalScale="{Binding ElementName=BWD_mm4}">
+                                        <ni:LinePlotRenderer Stroke="Blue" StrokeThickness="4" />
+                                    </ni:Plot>
+                                </ni:Graph.Plots>
+                                <ni:Graph.Axes>
+                                    <ni:AxisDouble x:Name="BWD_mm4" Range="0.0,4.0" Orientation="Horizontal" >
+                                        <ni:AxisDouble.MajorDivisions>
+                                            <ni:RangeLabeledDivisions LabelBrush="Blue" Mode="Count: 1">
+                                                <ni:RangeLabeledDivisions.LabelPresenter>
+                                                    <ni:GeneralValueFormatter Format="D" ShortFormat="{x:Null}"/>
+                                                </ni:RangeLabeledDivisions.LabelPresenter>
+                                            </ni:RangeLabeledDivisions>
+                                        </ni:AxisDouble.MajorDivisions>
+                                    </ni:AxisDouble>
+                                    <ni:AxisDouble x:Name="BWD_A4" Range="-5.0,0.0"  Orientation="Vertical" >
+                                        <ni:AxisDouble.MinorDivisions>
+                                            <ni:RangeDivisions/>
+                                        </ni:AxisDouble.MinorDivisions>
+                                        <ni:AxisDouble.MajorDivisions>
+                                            <ni:RangeLabeledDivisions LabelBrush="Red" Mode="Count: 3" >
+                                                <ni:RangeLabeledDivisions.LabelPresenter>
+                                                    <ni:GeneralValueFormatter Format="D" ShortFormat="{x:Null}"/>
+                                                </ni:RangeLabeledDivisions.LabelPresenter>
+                                            </ni:RangeLabeledDivisions>
+                                        </ni:AxisDouble.MajorDivisions>
+                                    </ni:AxisDouble>
+                                </ni:Graph.Axes>
+                            </ni:Graph>
+                        </Grid>
+                        <Grid Grid.Column="4" Grid.Row="3">
+                            <ni:Graph x:Name="Graph_BWD_Sub5">
+                                <ni:Graph.Plots>
+                                    <ni:Plot x:Name="BWD_P5"  AdjustVerticalScale="False" AdjustHorizontalScale="False" VerticalScale="{Binding ElementName=BWD_A5}"  HorizontalScale="{Binding ElementName=BWD_mm5}">
+                                        <ni:LinePlotRenderer Stroke="Blue" StrokeThickness="4" />
+                                    </ni:Plot>
+                                </ni:Graph.Plots>
+                                <ni:Graph.Axes>
+                                    <ni:AxisDouble x:Name="BWD_mm5" Range="0.0,4.0" Orientation="Horizontal" >
+                                        <ni:AxisDouble.MajorDivisions>
+                                            <ni:RangeLabeledDivisions LabelBrush="Blue" Mode="Count: 1">
+                                                <ni:RangeLabeledDivisions.LabelPresenter>
+                                                    <ni:GeneralValueFormatter Format="D" ShortFormat="{x:Null}"/>
+                                                </ni:RangeLabeledDivisions.LabelPresenter>
+                                            </ni:RangeLabeledDivisions>
+                                        </ni:AxisDouble.MajorDivisions>
+                                    </ni:AxisDouble>
+                                    <ni:AxisDouble x:Name="BWD_A5" Range="-5.0,0.0"  Orientation="Vertical" >
+                                        <ni:AxisDouble.MinorDivisions>
+                                            <ni:RangeDivisions/>
+                                        </ni:AxisDouble.MinorDivisions>
+                                        <ni:AxisDouble.MajorDivisions>
+                                            <ni:RangeLabeledDivisions LabelBrush="Red" Mode="Count: 3" >
+                                                <ni:RangeLabeledDivisions.LabelPresenter>
+                                                    <ni:GeneralValueFormatter Format="D" ShortFormat="{x:Null}"/>
+                                                </ni:RangeLabeledDivisions.LabelPresenter>
+                                            </ni:RangeLabeledDivisions>
+                                        </ni:AxisDouble.MajorDivisions>
+                                    </ni:AxisDouble>
+                                </ni:Graph.Axes>
+                            </ni:Graph>
+                        </Grid>
+                        <Grid Grid.Column="5" Grid.Row="3">
+                            <ni:Graph x:Name="Graph_BWD_Sub6">
+                                <ni:Graph.Plots>
+                                    <ni:Plot x:Name="BWD_P6" AdjustVerticalScale="False" AdjustHorizontalScale="False"   VerticalScale="{Binding ElementName=BWD_A6}"  HorizontalScale="{Binding ElementName=BWD_mm6}">
+                                        <ni:LinePlotRenderer Stroke="Blue" StrokeThickness="4" />
+                                    </ni:Plot>
+                                </ni:Graph.Plots>
+                                <ni:Graph.Axes>
+                                    <ni:AxisDouble x:Name="BWD_mm6" Range="0.0,4.0" Orientation="Horizontal" >
+                                        <ni:AxisDouble.MajorDivisions>
+                                            <ni:RangeLabeledDivisions LabelBrush="Blue" Mode="Count: 1">
+                                                <ni:RangeLabeledDivisions.LabelPresenter>
+                                                    <ni:GeneralValueFormatter Format="D" ShortFormat="{x:Null}"/>
+                                                </ni:RangeLabeledDivisions.LabelPresenter>
+                                            </ni:RangeLabeledDivisions>
+                                        </ni:AxisDouble.MajorDivisions>
+                                    </ni:AxisDouble>
+                                    <ni:AxisDouble x:Name="BWD_A6" Range="-5.0,0.0"  Orientation="Vertical" >
+                                        <ni:AxisDouble.MinorDivisions>
+                                            <ni:RangeDivisions/>
+                                        </ni:AxisDouble.MinorDivisions>
+                                        <ni:AxisDouble.MajorDivisions>
+                                            <ni:RangeLabeledDivisions LabelBrush="Red" Mode="Count: 3" >
+                                                <ni:RangeLabeledDivisions.LabelPresenter>
+                                                    <ni:GeneralValueFormatter Format="D" ShortFormat="{x:Null}"/>
+                                                </ni:RangeLabeledDivisions.LabelPresenter>
+                                            </ni:RangeLabeledDivisions>
+                                        </ni:AxisDouble.MajorDivisions>
+                                    </ni:AxisDouble>
+                                </ni:Graph.Axes>
+                            </ni:Graph>
+                        </Grid>
+                        <Grid Grid.Column="6" Grid.Row="3">
+                            <ni:Graph x:Name="Graph_BWD_Sub7">
+                                <ni:Graph.Plots>
+                                    <ni:Plot x:Name="BWD_P7" AdjustVerticalScale="False" AdjustHorizontalScale="False"  VerticalScale="{Binding ElementName=BWD_A7}"  HorizontalScale="{Binding ElementName=BWD_mm7}">
+                                        <ni:LinePlotRenderer Stroke="Blue" StrokeThickness="4" />
+                                    </ni:Plot>
+                                </ni:Graph.Plots>
+                                <ni:Graph.Axes>
+                                    <ni:AxisDouble x:Name="BWD_mm7" Range="0.0,4.0" Orientation="Horizontal" >
+                                        <ni:AxisDouble.MajorDivisions>
+                                            <ni:RangeLabeledDivisions LabelBrush="Blue" Mode="Count: 1">
+                                                <ni:RangeLabeledDivisions.LabelPresenter>
+                                                    <ni:GeneralValueFormatter Format="D" ShortFormat="{x:Null}"/>
+                                                </ni:RangeLabeledDivisions.LabelPresenter>
+                                            </ni:RangeLabeledDivisions>
+                                        </ni:AxisDouble.MajorDivisions>
+                                    </ni:AxisDouble>
+                                    <ni:AxisDouble x:Name="BWD_A7" Range="-5.0,0.0"  Orientation="Vertical" >
+                                        <ni:AxisDouble.MinorDivisions>
+                                            <ni:RangeDivisions/>
+                                        </ni:AxisDouble.MinorDivisions>
+                                        <ni:AxisDouble.MajorDivisions>
+                                            <ni:RangeLabeledDivisions LabelBrush="Red" Mode="Count: 3" >
+                                                <ni:RangeLabeledDivisions.LabelPresenter>
+                                                    <ni:GeneralValueFormatter Format="D" ShortFormat="{x:Null}"/>
+                                                </ni:RangeLabeledDivisions.LabelPresenter>
+                                            </ni:RangeLabeledDivisions>
+                                        </ni:AxisDouble.MajorDivisions>
+                                    </ni:AxisDouble>
+                                </ni:Graph.Axes>
+                            </ni:Graph>
+                        </Grid>
+                        <Grid Grid.Column="7" Grid.Row="3">
+                            <ni:Graph x:Name="Graph_BWD_Sub8">
+                                <ni:Graph.Plots>
+                                    <ni:Plot x:Name="BWD_P8" AdjustVerticalScale="False" AdjustHorizontalScale="False"  VerticalScale="{Binding ElementName=BWD_A8}"  HorizontalScale="{Binding ElementName=BWD_mm8}">
+                                        <ni:LinePlotRenderer Stroke="Blue" StrokeThickness="4" />
+                                    </ni:Plot>
+                                </ni:Graph.Plots>
+                                <ni:Graph.Axes>
+                                    <ni:AxisDouble x:Name="BWD_mm8" Range="0.0,4.0" Orientation="Horizontal" >
+                                        <ni:AxisDouble.MajorDivisions>
+                                            <ni:RangeLabeledDivisions LabelBrush="Blue" Mode="Count: 1">
+                                                <ni:RangeLabeledDivisions.LabelPresenter>
+                                                    <ni:GeneralValueFormatter Format="D" ShortFormat="{x:Null}"/>
+                                                </ni:RangeLabeledDivisions.LabelPresenter>
+                                            </ni:RangeLabeledDivisions>
+                                        </ni:AxisDouble.MajorDivisions>
+                                    </ni:AxisDouble>
+                                    <ni:AxisDouble x:Name="BWD_A8" Range="-5.0,0.0"  Orientation="Vertical" >
+                                        <ni:AxisDouble.MinorDivisions>
+                                            <ni:RangeDivisions/>
+                                        </ni:AxisDouble.MinorDivisions>
+                                        <ni:AxisDouble.MajorDivisions>
+                                            <ni:RangeLabeledDivisions LabelBrush="Red" Mode="Count: 3" >
+                                                <ni:RangeLabeledDivisions.LabelPresenter>
+                                                    <ni:GeneralValueFormatter Format="D" ShortFormat="{x:Null}"/>
+                                                </ni:RangeLabeledDivisions.LabelPresenter>
+                                            </ni:RangeLabeledDivisions>
+                                        </ni:AxisDouble.MajorDivisions>
+                                    </ni:AxisDouble>
+                                </ni:Graph.Axes>
+                            </ni:Graph>
+                        </Grid>
+
+
+
+
+
+                        <Grid Grid.Column="0" Grid.ColumnSpan="9" Grid.Row="4" Grid.RowSpan="2">
+                            <Expander Header="GRAPH MENU" Background="#FF8C96D2" HorizontalAlignment="Stretch" ExpandDirection="Up" IsExpanded="False">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="100"/>
+                                        <ColumnDefinition Width="460"/>
+                                        <ColumnDefinition Width="200"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <Grid Grid.Column="0" >
+                                        <StackPanel Orientation="Vertical">
+                                            <Button x:Name="AN2MBCFileOpen" Margin="2,2,2,2" Click="AN2MBCFileOpen_Click">OPEN</Button>
+                                        </StackPanel>
+                                    </Grid>
+                                    <Grid Grid.Column="1">
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="*"/>
+                                            <RowDefinition Height="*"/>
+                                            <RowDefinition Height="*"/>
+                                            <RowDefinition Height="*"/>
+                                        </Grid.RowDefinitions>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="2*"/>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="2*"/>
+                                            <ColumnDefinition Width="*"/>
+                                        </Grid.ColumnDefinitions>
+
+
+
+                                        <Grid Grid.Column="0" Grid.Row="0">
+                                            <Label VerticalContentAlignment="Center">1회전당거리(mm)</Label>
+                                        </Grid>
+                                        <Grid Grid.Column="1" Grid.Row="0">
+                                            <ni:NumericTextBoxDouble Margin="2,2,2,2" x:Name="A2_RPM_mm" Value="4.00" Interval="0.01" Range="3.5, 4.5, System.Double" BorderThickness="0">
+                                                <ni:NumericTextBoxDouble.ValueFormatter>
+                                                    <ni:GeneralValueFormatter Format="N2" ShortFormat="{x:Null}"/>
+                                                </ni:NumericTextBoxDouble.ValueFormatter>
+                                            </ni:NumericTextBoxDouble>
+                                        </Grid>
+                                        <Grid Grid.Column="0" Grid.Row="1">
+                                            <Label VerticalContentAlignment="Center">시작위치(mm)</Label>
+                                        </Grid>
+                                        <Grid Grid.Column="1" Grid.Row="1">
+                                            <ni:NumericTextBoxDouble Margin="2,2,2,2" x:Name="A2_Start_mm" Value="2.00" Interval="0.01" Range="1.0, 35.0, System.Double" BorderThickness="0">
+                                                <ni:NumericTextBoxDouble.ValueFormatter>
+                                                    <ni:GeneralValueFormatter Format="N2" ShortFormat="{x:Null}"/>
+                                                </ni:NumericTextBoxDouble.ValueFormatter>
+                                            </ni:NumericTextBoxDouble>
+                                        </Grid>
+                                        <Grid Grid.Column="0" Grid.Row="2">
+                                            <Label VerticalContentAlignment="Center">종료위치(mm)</Label>
+                                        </Grid>
+                                        <Grid Grid.Column="1" Grid.Row="2">
+                                            <ni:NumericTextBoxDouble Margin="2,2,2,2" x:Name="A2_End_mm" Value="30.00" Interval="0.01" Range="25.0, 35.0, System.Double" BorderThickness="0">
+                                                <ni:NumericTextBoxDouble.ValueFormatter>
+                                                    <ni:GeneralValueFormatter Format="N2" ShortFormat="{x:Null}"/>
+                                                </ni:NumericTextBoxDouble.ValueFormatter>
+                                            </ni:NumericTextBoxDouble>
+                                        </Grid>
+                                        <Grid Grid.Column="0" Grid.Row="3">
+                                            <Label VerticalContentAlignment="Center">이동평균 데이터 개수</Label>
+                                        </Grid>
+                                        <Grid Grid.Column="1" Grid.Row="3">
+                                            <ni:NumericTextBoxInt16 Margin="2,2,2,2" x:Name="A2_MV_counts" Value="100" BorderThickness="0"/>
+                                        </Grid>
+
+                                        <Grid Grid.Column="2" Grid.Row="0">
+                                            <Label VerticalContentAlignment="Center">전진 편차 상한</Label>
+                                        </Grid>
+                                        <Grid Grid.Column="3" Grid.Row="0">
+                                            <ni:NumericTextBoxDouble Margin="2,2,2,2" x:Name="FWD_Diff" Value="1.00" Interval="0.01" Range="0.0, 5.5, System.Double" BorderThickness="0">
+                                                <ni:NumericTextBoxDouble.ValueFormatter>
+                                                    <ni:GeneralValueFormatter Format="N2" ShortFormat="{x:Null}"/>
+                                                </ni:NumericTextBoxDouble.ValueFormatter>
+                                            </ni:NumericTextBoxDouble>
+                                        </Grid>
+
+                                        <Grid Grid.Column="2" Grid.Row="1">
+                                            <Label VerticalContentAlignment="Center">후진 편차 상한</Label>
+                                        </Grid>
+                                        <Grid Grid.Column="3" Grid.Row="1">
+                                            <ni:NumericTextBoxDouble Margin="2,2,2,2" x:Name="BWD_Diff" Value="1.00" Interval="0.01" Range="0.0, 5.5, System.Double" BorderThickness="0">
+                                                <ni:NumericTextBoxDouble.ValueFormatter>
+                                                    <ni:GeneralValueFormatter Format="N2" ShortFormat="{x:Null}"/>
+                                                </ni:NumericTextBoxDouble.ValueFormatter>
+                                            </ni:NumericTextBoxDouble>
+                                        </Grid>
+                                        <Grid Grid.Column="2" Grid.ColumnSpan="2" Grid.Row="2">
+                                            <StackPanel Orientation="Horizontal">
+                                                <Label>FWD</Label>
+                                                <CheckBox x:Name="FC_1" IsChecked="False"></CheckBox>
+                                                <CheckBox x:Name="FC_2" IsChecked="True"></CheckBox>
+                                                <CheckBox x:Name="FC_3" IsChecked="True"></CheckBox>
+                                                <CheckBox x:Name="FC_4" IsChecked="True"></CheckBox>
+                                                <CheckBox x:Name="FC_5" IsChecked="True"></CheckBox>
+                                                <CheckBox x:Name="FC_6" IsChecked="True"></CheckBox>
+                                                <CheckBox x:Name="FC_7" IsChecked="True"></CheckBox>
+                                                <CheckBox x:Name="FC_8" IsChecked="False"></CheckBox>
+                                            </StackPanel>
+                                        </Grid>
+                                        <Grid Grid.Column="2" Grid.ColumnSpan="2" Grid.Row="3">
+                                            <StackPanel Orientation="Horizontal">
+                                                <Label>BWD</Label>
+                                                <CheckBox x:Name="BC_1" IsChecked="False"></CheckBox>
+                                                <CheckBox x:Name="BC_2" IsChecked="True"></CheckBox>
+                                                <CheckBox x:Name="BC_3" IsChecked="True"></CheckBox>
+                                                <CheckBox x:Name="BC_4" IsChecked="True"></CheckBox>
+                                                <CheckBox x:Name="BC_5" IsChecked="True"></CheckBox>
+                                                <CheckBox x:Name="BC_6" IsChecked="True"></CheckBox>
+                                                <CheckBox x:Name="BC_7" IsChecked="True"></CheckBox>
+                                                <CheckBox x:Name="BC_8" IsChecked="False"></CheckBox>
+                                            </StackPanel>
+                                        </Grid>
+                                    </Grid>
+                                    <Grid Grid.Column="2">
+                                        <StackPanel Orientation="Vertical" Visibility="Hidden">
+                                            <Label>Y축 최대값(전체축동일)</Label>
+                                            <ni:NumericTextBoxDouble x:Name="AN2YMax" Value="5.0" ValueChanged="AN2YMax_ValueChanged"/>
+                                        </StackPanel>
+                                    </Grid>
+                                    <Grid Grid.Column="3" >
+
+                                    </Grid>
+                                </Grid>
+                            </Expander>
+                        </Grid>
+                    </Grid>
+                </TabItem>
+                <!-- No.9 -->
+                <TabItem/>
+                <!-- No.10 -->
+                <TabItem/>
+                <!-- No.11 내부 리크 테스트 5.0Bar 추가화면으로 정리함 -->
+                <TabItem>
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="140"/>
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="10"/>
+                        </Grid.ColumnDefinitions>
+                        <ni:Graph x:Name="IntLeakGraph5" RenderMode="Raster" Interactions="Zoom, ZoomHorizontal, ZoomVertical, ZoomIn, ZoomOut, Pan, PanHorizontal, PanVertical"
+							DataSource="{Binding GraphData1}"  BorderThickness="2"  >
+                            <ni:Graph.Plots >
+                                <ni:Plot x:Name="In_P_TestP5" AdjustVerticalScale="False" Label="Test Vacuum" VerticalScale="{Binding ElementName=In_TestPressure5}"  HorizontalScale="{Binding ElementName=In_Time5}">
+                                    <ni:PointPlotRenderer Fill="Green" Shape="Cross" Stroke="Green" Size="2,2" />
+                                </ni:Plot>
+                                <ni:Plot x:Name="In_P_LeakP5" AdjustVerticalScale="False" Label="Leak Vacuum" VerticalScale="{Binding ElementName=In_LeakPressure5}" HorizontalScale="{Binding ElementName=In_Time5}">
+                                    <ni:LinePlotRenderer Stroke="Red" StrokeThickness="4"/>
+                                </ni:Plot>
+                            </ni:Graph.Plots>
+                            <ni:Graph.Axes>
+                                <ni:AxisDouble x:Name="In_Time5"         Range="0.0,20.0"   Orientation="Horizontal" Label="시험시간(초)"  >
+                                    <ni:AxisDouble.LabelTemplate>
+                                        <DataTemplate>
+                                            <TextBlock Text="{Binding}" FontSize="14" Foreground="Blue"/>
+                                        </DataTemplate>
+                                    </ni:AxisDouble.LabelTemplate>
+                                    <ni:AxisDouble.MajorDivisions>
+                                        <ni:RangeLabeledDivisions LabelBrush="Blue" Mode="Count: 10">
+                                            <ni:RangeLabeledDivisions.LabelPresenter>
+                                                <ni:GeneralValueFormatter Format="N1" ShortFormat="{x:Null}"/>
+                                            </ni:RangeLabeledDivisions.LabelPresenter>
+                                        </ni:RangeLabeledDivisions>
+                                    </ni:AxisDouble.MajorDivisions>
+                                </ni:AxisDouble>
+                                <ni:AxisDouble x:Name="In_TestPressure5" Range="0.0,5.0"  Orientation="Vertical"   Label="시험압(bar)" >
+                                    <ni:AxisDouble.LabelTemplate>
+                                        <DataTemplate>
+                                            <TextBlock Text="{Binding}" FontSize="16" Foreground="Green"/>
+                                        </DataTemplate>
+                                    </ni:AxisDouble.LabelTemplate>
+                                    <ni:AxisDouble.MinorDivisions>
+                                        <ni:RangeDivisions/>
+                                    </ni:AxisDouble.MinorDivisions>
+                                    <ni:AxisDouble.MajorDivisions>
+                                        <ni:RangeLabeledDivisions LabelBrush="Green" Mode="Count: 7" >
+                                            <ni:RangeLabeledDivisions.LabelPresenter>
+                                                <ni:GeneralValueFormatter Format="N1" ShortFormat="{x:Null}"/>
+                                            </ni:RangeLabeledDivisions.LabelPresenter>
+                                        </ni:RangeLabeledDivisions>
+                                    </ni:AxisDouble.MajorDivisions>
+                                </ni:AxisDouble>
+                                <ni:AxisDouble x:Name="In_LeakPressure5" Range="0.0,10.0"   Orientation="Vertical"   Label="누설량(mbar)" >
+                                    <ni:AxisDouble.LabelTemplate>
+                                        <DataTemplate>
+                                            <TextBlock Text="{Binding}" FontSize="16" Foreground="Red"/>
+                                        </DataTemplate>
+                                    </ni:AxisDouble.LabelTemplate>
+                                    <ni:AxisDouble.MajorDivisions>
+                                        <ni:RangeLabeledDivisions LabelBrush="Red" TickBrush="Red" TickMark="Ellipse" LabelOrientation="None" Mode="Count: 5" >
+                                            <ni:RangeLabeledDivisions.LabelPresenter>
+                                                <ni:GeneralValueFormatter Format="N1" ShortFormat="{x:Null}"/>
+                                            </ni:RangeLabeledDivisions.LabelPresenter>
+                                        </ni:RangeLabeledDivisions>
+                                    </ni:AxisDouble.MajorDivisions>
+                                </ni:AxisDouble>
+                            </ni:Graph.Axes>
+                            <ni:Graph.Children>
+                                <ni:MultiPlotCursor x:Name="INT_Leak50" Label="Check" CrosshairBrush="Blue" Foreground="Blue" TargetBrush="Red" Cursor="Hand" LabelVisibility="Visible" TargetShape="Plus" TargetSize="25,25"  >
+                                    <ni:MultiPlotCursor.AxisValue>
+                                        <System:Double>5</System:Double>
+                                    </ni:MultiPlotCursor.AxisValue>
+                                    <ni:MultiPlotCursor.ValuePresenter>
+                                        <ni:ValueFormatterGroup>
+                                            <ni:ValueFormatterGroup.DefaultFormatter>
+                                                <ni:GeneralValueFormatter x:Name="VF_ILeak50" Format="N2" FontSize="20" FontStretch="UltraExpanded" FontStyle="Normal" FontWeight="Bold" ShortFormat="" Background="#FF6E1A1A" FrameworkElement.FlowDirection="RightToLeft" FontFamily="Century"/>
+                                            </ni:ValueFormatterGroup.DefaultFormatter>
+                                        </ni:ValueFormatterGroup>
+                                    </ni:MultiPlotCursor.ValuePresenter>
+                                </ni:MultiPlotCursor>
+                            </ni:Graph.Children>                            
+                        </ni:Graph>
+                        <Border Grid.Column="0" Grid.ColumnSpan="1" Grid.Row="1"  Margin="2,2,2,2">
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="40"/>
+                                    <RowDefinition Height="30"/>
+                                    <RowDefinition Height="30"/>
+                                    <RowDefinition Height="30"/>
+
+                                </Grid.RowDefinitions>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="200"/>
+                                    <ColumnDefinition Width="200"/>
+                                    <ColumnDefinition Width="200"/>
+                                    <ColumnDefinition Width="200"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <Border Grid.Column="0" Grid.ColumnSpan="5" Grid.Row="0" Margin="1,1,1,1" >
+                                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                                        <iconPacks:PackIconMaterial  Kind="Adjust" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                                        <Label Content="iMEB ASS'Y 내부 리크 " VerticalContentAlignment="Center" HorizontalContentAlignment="Center" FontSize="24" FontStyle="Italic" FontWeight="ExtraBlack"/>
+                                    </StackPanel>
+                                </Border>
+
+                                <Border Grid.Column="0" Grid.Row="1" Margin="1,1,1,1" BorderThickness="1" BorderBrush="Gray">
+                                    <Label Content="시험압(bar)" VerticalContentAlignment="Center" HorizontalContentAlignment="Center"/>
+                                </Border>
+                                <Border Grid.Column="0" Grid.Row="2" Grid.RowSpan="2" Margin="1,1,1,1">
+                                    <Label x:Name="LT50_TestPressure" Content="0.0" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" FontSize="22" Foreground="Blue" FontWeight="Bold" />
+                                </Border>
+
+                                <Border Grid.Column="1" Grid.Row="1" Margin="1,1,1,1" BorderThickness="1" BorderBrush="Gray">
+                                    <Label Content="누설량 기준" VerticalContentAlignment="Center" HorizontalContentAlignment="Center"/>
+                                </Border>
+
+                                <Border Grid.Column="1" Grid.Row="2"  Margin="1,1,1,1">
+                                    <StackPanel Orientation="Horizontal">
+                                        <iconPacks:PackIconMaterial Kind="Upload" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                                        <Label Content="최대" Width="50" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" />
+                                        <Label x:Name="LT50_LeakMax" Content="10.0" Width="60" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" />
+                                        <Label Content="mbar" VerticalContentAlignment="Center" />
+                                    </StackPanel>
+                                </Border>
+                                <Border Grid.Column="1" Grid.Row="3"  Margin="1,1,1,1">
+                                    <StackPanel Orientation="Horizontal">
+                                        <iconPacks:PackIconMaterial Kind="Download" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                                        <Label Content="최소" Width="50" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" />
+                                        <Label x:Name="LT50_LeakMin" Content="0.00" Width="60" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" />
+                                        <Label Content="mbar" VerticalContentAlignment="Center" />
+                                    </StackPanel>
+                                </Border>
+
+                                <Border Grid.Column="2" Grid.Row="1" Margin="1,1,1,1" BorderThickness="1" BorderBrush="Gray">
+                                    <Label Content="측정결과 누설량(mbar)" VerticalContentAlignment="Center" HorizontalContentAlignment="Center"/>
+                                </Border>
+                                <Border Grid.Column="2" Grid.Row="2" Grid.RowSpan="2" Margin="1,1,1,1">
+                                    <Label x:Name="LT50_Leak" Content="0.000" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" FontSize="22" Foreground="Blue" FontWeight="Bold" />
+                                </Border>
+
+                                <Border Grid.Column="3" Grid.Row="1" Margin="1,1,1,1" BorderThickness="1" BorderBrush="Gray">
+                                    <Label Content="시험시간(초)" VerticalContentAlignment="Center" HorizontalContentAlignment="Center"/>
+                                </Border>
+                                <Border Grid.Column="3" Grid.Row="2" Grid.RowSpan="2" Margin="1,1,1,1">
+                                    <Label x:Name="LT50_TestTime" Content="0.0" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" FontSize="22" Foreground="Blue" FontWeight="Bold" />
+                                </Border>
+
+                                <Border Grid.Column="4" Grid.Row="1" Margin="1,1,1,1" BorderThickness="1" BorderBrush="Gray">
+                                    <Label Content="시험판정" VerticalContentAlignment="Center" HorizontalContentAlignment="Center"/>
+                                </Border>
+                                <Border Grid.Column="4" Grid.Row="2" Grid.RowSpan="2" Margin="1,1,1,1">
+                                    <Label x:Name="LT50_Result" Content="OK" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" FontSize="32" Foreground="Blue" FontWeight="Bold" />
+                                </Border>
+
+
+                            </Grid>
+                        </Border>
+                    </Grid>
+                </TabItem>
+                <!-- No.12 ECU 모터 리크 테스트 MC34 추가화면으로 정리함-->
+
+            </TabControl>
+        </Grid>
+    </Grid>
+
+</Controls:MetroWindow>

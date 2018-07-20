@@ -1,0 +1,33 @@
+﻿2017-07-26
+  1. Renew
+     - 폴더별 정리
+	 - System Enviroment 구축
+	 - *.Xaml 구성 설정 화일 이용
+	 - Nlog 사용
+	 - 개발 노툭북환경 x64이며 타켓은 x86(32bit)임, 드라이버 설정 주의 요망
+	 - VisualStudio 2015개발툴 변경(MeasurementStudio 2015 라이센스 획은은 VS2013에서 업데이트후 사용가능)
+
+ 2. ECU 구동관련
+     - Single/Multi Actuator Control 기능 추가
+	 - WSV 및 LP_WSV 구동을 Single/Multi Actuator Control로 구동 테스트 -> Leak Test 기능 수행시 동시에 수행 불가 판정(모비스확인)
+	 - Leak Test 명령으로 현위치 동작으로 솔밸브 구동으로 동작 확인(2017/09/18)
+
+ 3. 판정 결과 화면 수정
+
+ 2017-09-20
+
+ 1. 로그창 - 일자변경시 자동으로 변경되도록
+
+ 2018-07-17
+
+ 1. 시간단축
+    
+	고진공 시험
+		SUB_STEP.PreChargeVacuum_1 : 4초 진공 가압에서 3초로 변경
+
+    5바 리크시험
+		SUB_STEP.CHARGE_TIME_CHECK : 7초 가압에서 4초로 변경
+
+	모터 리크 테스트
+		SUB_STEP.ECU_ON_WAIT1 : 2초에서 0.8초
+		SUB_STEP.ECU_CAN_MotorInit_Wait : 모터 초기화 명령 전송후 대기시간, 4초에서 2.5초로 변경
